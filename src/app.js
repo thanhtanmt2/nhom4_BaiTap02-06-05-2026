@@ -17,21 +17,23 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '../public')));
-
-// Routes
+// Routes (API routes first)
 const authRoutes = require('./routes/auth.routes');
 const profileRoutes = require('./routes/profile.routes');
 const passwordRoutes = require('./routes/password.routes');
+const debugRoutes = require('./routes/debug.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', passwordRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/debug', debugRoutes);
 
-// Fallback to index.html for root path
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+// Serve static files from frontend build
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Fallback to index.html for frontend routing (React Router)
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 module.exports = app;

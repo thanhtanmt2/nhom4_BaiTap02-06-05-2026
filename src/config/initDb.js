@@ -14,19 +14,20 @@ const initializeDatabase = async () => {
         port: process.env.DB_PORT || 3306,
         dialect: 'mysql',
         logging: false,
-        dialectOptions: {
-          socketPath: '/tmp/mysql.sock',
-        },
       }
     );
 
-    // Create database if not exists
-    const dbName = process.env.DB_NAME || 'nhom4_baitap';
-    await sequelizeAdmin.query(
-      `CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-    );
-    console.log(`✓ Database '${dbName}' được tạo hoặc đã tồn tại`);
-    await sequelizeAdmin.close();
+    try {
+      // Create database if not exists
+      const dbName = process.env.DB_NAME || 'nhom4_baitap';
+      await sequelizeAdmin.query(
+        `CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+      );
+      console.log(`✓ Database '${dbName}' được tạo hoặc đã tồn tại`);
+    } finally {
+      // Close the admin connection
+      await sequelizeAdmin.close();
+    }
 
     // Now connect to the actual database
     const sequelize = require('./database');
@@ -39,9 +40,11 @@ const initializeDatabase = async () => {
 
     // Create admin account
     await createAdminAccount();
+    
+    console.log('✓ Database initialization hoàn tất');
   } catch (error) {
     console.error('✗ Lỗi kết nối database:', error.message);
-    process.exit(1);
+    throw error;
   }
 };
 
