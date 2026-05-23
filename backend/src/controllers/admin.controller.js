@@ -17,7 +17,7 @@ const getDashboardStats = async (req, res) => {
       User.count({ where: { status: 'inactive' } }),
       User.count({ where: { created_at: { [Op.gte]: startOfMonth } } }),
       User.findAll({
-        attributes: ['id', 'name', 'email', 'role', 'status', 'created_at', 'department'],
+        attributes: ['id', 'name', 'email', 'role', 'status', 'created_at', 'department_id'],
         include: [{ model: Profile, attributes: ['avatar_url', 'full_name'] }],
         order: [['created_at', 'DESC']],
         limit: 10,
@@ -48,7 +48,7 @@ const getUsers = async (req, res) => {
     }
     if (role) whereClause.role = role;
     if (status) whereClause.status = status;
-    if (department) whereClause.department = department;
+    if (department) whereClause.department_id = department; // department giờ là ID số nguyên
     if (created_from || created_to) {
       whereClause.created_at = {};
       if (created_from) whereClause.created_at[Op.gte] = new Date(created_from);

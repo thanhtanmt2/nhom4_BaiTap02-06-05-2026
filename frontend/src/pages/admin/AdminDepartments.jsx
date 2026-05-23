@@ -15,10 +15,14 @@ const AdminDepartments = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // State điều khiển Modal (null = đóng, 'create' = thêm mới, object = chỉnh sửa)
+  // State điều khiển Modal thêm/sửa (null = đóng, 'create' = thêm mới, object = chỉnh sửa)
   const [modalMode, setModalMode] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
+
+  // State điều khiển Modal xác nhận kích hoạt/vô hiệu hóa
+  const [confirmModal, setConfirmModal] = useState(null); // null | { dept, newStatus }
+  const [searchText, setSearchText] = useState(''); // tìm kiếm theo tên
 
   // Lấy danh sách phòng ban từ API
   const fetchDepartments = async () => {
@@ -91,15 +95,17 @@ const AdminDepartments = () => {
     }
   };
 
-  // Kích hoạt hoặc vô hiệu hóa phòng ban
-  const handleToggleStatus = async (dept) => {
+  // Bước 1: Mở modal xác nhận (không dùng window.confirm nữa)
+  const handleToggleStatus = (dept) => {
     const newStatus = dept.status === 'active' ? 'inactive' : 'active';
-    const confirmMsg =
-      newStatus === 'inactive'
-        ? `Bạn có chắc muốn vô hiệu hóa phòng ban "${dept.name}"?`
-        : `Bạn có chắc muốn kích hoạt lại phòng ban "${dept.name}"?`;
-    if (!window.confirm(confirmMsg)) return;
+    setConfirmModal({ dept, newStatus });
+  };
 
+  // Bước 2: Thực hiện khi user bấm xác nhận trong modal
+  const handleConfirmToggle = async () => {
+    if (!confirmModal) return;
+    const { dept, newStatus } = confirmModal;
+    setConfirmModal(null);
     try {
       const res = await adminService.updateDepartmentStatus(dept.id, newStatus);
       if (res.success) {
@@ -114,16 +120,31 @@ const AdminDepartments = () => {
   return (
     <div className="p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex-1">
           <h1 className="text-2xl font-extrabold text-gray-800">Quản lý Phòng ban</h1>
           <p className="text-gray-500 text-sm mt-1">
             Thêm mới, chỉnh sửa và quản lý danh mục phòng ban trong hệ thống
           </p>
         </div>
+        {/* Ô tìm kiếm */}
+        <div className="relative">
+          <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Tìm theo tên phòng ban..."
+            className="pl-9 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none w-64 transition-all"
+          />
+        </div>
         <button
           onClick={handleOpenCreate}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-5 rounded-xl transition-colors shadow-sm flex items-center gap-2"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-5 rounded-xl transition-colors shadow-sm flex items-center gap-2 shrink-0"
         >
           <span className="text-lg leading-none">+</span> Thêm phòng ban
         </button>
@@ -179,7 +200,7 @@ const AdminDepartments = () => {
                     </div>
                   </td>
                 </tr>
-              ) : departments.length === 0 ? (
+              ) : departments.filter(d => d.name.toLowerCase().includes(searchText.toLowerCase())).length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center gap-2">
@@ -189,7 +210,9 @@ const AdminDepartments = () => {
                   </td>
                 </tr>
               ) : (
-                departments.map((dept) => (
+                departments
+                  .filter(d => d.name.toLowerCase().includes(searchText.toLowerCase()))
+                  .map((dept) => (
                   <tr key={dept.id} className="hover:bg-gray-50 transition-colors">
                     {/* ID */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -343,6 +366,59 @@ const AdminDepartments = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* ======================================================
+          MODAL: Xác nhận Kích hoạt / Vô hiệu hóa
+          ====================================================== */}
+      {confirmModal !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden">
+            {/* Icon cảnh báo */}
+            <div className="flex flex-col items-center px-6 pt-8 pb-4">
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-4 ${
+                confirmModal.newStatus === 'inactive' ? 'bg-red-100' : 'bg-green-100'
+              }`}>
+                {confirmModal.newStatus === 'inactive' ? (
+                  <svg className="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                ) : (
+                  <svg className="w-7 h-7 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+              </div>
+              <h2 className="text-lg font-bold text-gray-800 text-center">
+                {confirmModal.newStatus === 'inactive' ? 'Vô hiệu hóa phòng ban?' : 'Kích hoạt phòng ban?'}
+              </h2>
+              <p className="text-sm text-gray-500 text-center mt-2">
+                {confirmModal.newStatus === 'inactive'
+                  ? <span>Phòng ban <strong className="text-gray-800">{confirmModal.dept.name}</strong> sẽ không còn xuất hiện trong danh sách lựa chọn của HR.</span>
+                  : <span>Phòng ban <strong className="text-gray-800">{confirmModal.dept.name}</strong> sẽ hoạt động trở lại bình thường.</span>
+                }
+              </p>
+            </div>
+            {/* Nút hành động */}
+            <div className="flex gap-3 px-6 pb-6 pt-2">
+              <button
+                onClick={() => setConfirmModal(null)}
+                className="flex-1 py-2.5 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleConfirmToggle}
+                className={`flex-1 py-2.5 rounded-xl text-white text-sm font-medium transition-colors shadow-sm ${
+                  confirmModal.newStatus === 'inactive'
+                    ? 'bg-red-500 hover:bg-red-600'
+                    : 'bg-green-500 hover:bg-green-600'
+                }`}
+              >
+                {confirmModal.newStatus === 'inactive' ? 'Xác nhận Vô hiệu hóa' : 'Xác nhận Kích hoạt'}
+              </button>
+            </div>
           </div>
         </div>
       )}

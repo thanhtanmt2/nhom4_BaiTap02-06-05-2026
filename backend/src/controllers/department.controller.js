@@ -23,7 +23,7 @@ const getDepartments = async (req, res) => {
           attributes: ['id'],
         },
       ],
-      order: [['name', 'ASC']],
+      order: [['id', 'ASC']],
     });
 
     // Định dạng lại response: thêm trường userCount cho tiện dùng ở frontend
