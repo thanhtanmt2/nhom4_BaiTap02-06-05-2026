@@ -20,4 +20,25 @@ export const adminService = {
     const response = await axiosClient.put(`/admin/users/${userId}/role`, { role });
     return response.data;
   },
+
+  // ---- Department APIs ----
+  getDepartments: async (params) => {
+    const response = await axiosClient.get('/admin/departments', { params });
+    return response.data;
+  },
+
+  createDepartment: async (data) => {
+    const response = await axiosClient.post('/admin/departments', data);
+    return response.data;
+  },
+
+  updateDepartment: async (id, data) => {
+    const response = await axiosClient.put(`/admin/departments/${id}`, data);
+    return response.data;
+  },
+
+  updateDepartmentStatus: async (id, status) => {
+    const response = await axiosClient.put(`/admin/departments/${id}/status`, { status });
+    return response.data;
+  },
 };
