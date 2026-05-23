@@ -7,6 +7,7 @@ const {
   getUserById,
   updateUserStatus,
   updateUserRole,
+  createUser,
 } = require('../controllers/admin.controller');
 const {
   getDepartments,
@@ -18,8 +19,9 @@ const {
 // Dashboard stats (Nhut)
 router.get('/dashboard', authenticateToken, authorizeAdmin, getDashboardStats);
 
-// User management (Tan)
+// User management
 router.get('/users', authenticateToken, authorizeAdmin, getUsers);
+router.post('/users', authenticateToken, authorizeAdmin, createUser);  // Tạo user mới
 router.get('/users/:userId', authenticateToken, authorizeAdmin, getUserById);
 router.put('/users/:userId/status', authenticateToken, authorizeAdmin, updateUserStatus);
 router.put('/users/:userId/role', authenticateToken, authorizeAdmin, updateUserRole);

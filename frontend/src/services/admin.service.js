@@ -21,6 +21,11 @@ export const adminService = {
     return response.data;
   },
 
+  createUser: async (data) => {
+    const response = await axiosClient.post('/admin/users', data);
+    return response.data;
+  },
+
   // ---- Department APIs ----
   getDepartments: async (params) => {
     const response = await axiosClient.get('/admin/departments', { params });
