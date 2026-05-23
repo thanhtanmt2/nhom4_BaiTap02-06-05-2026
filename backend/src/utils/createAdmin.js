@@ -24,12 +24,12 @@ async function createAdminAccount() {
     const testUserExists = await User.findOne({ where: { email: testUserEmail } });
     if (testUserExists) {
       const hashedTestPw = await bcrypt.hash(testUserPassword, 10);
-      await testUserExists.update({ password: hashedTestPw, role: 'user', status: 'active' });
-      console.log(`✓ Cập nhật tài khoản user test: ${testUserEmail}`);
+      await testUserExists.update({ password: hashedTestPw, role: 'employee', status: 'active' });
+      console.log(`✓ Cập nhật tài khoản employee test: ${testUserEmail}`);
     } else {
       const hashedTestPw = await bcrypt.hash(testUserPassword, 10);
-      await User.create({ email: testUserEmail, password: hashedTestPw, role: 'user', status: 'active' });
-      console.log(`✓ Tài khoản user test đã được tạo: ${testUserEmail}`);
+      await User.create({ email: testUserEmail, password: hashedTestPw, role: 'employee', status: 'active' });
+      console.log(`✓ Tài khoản employee test đã được tạo: ${testUserEmail}`);
     }
   } catch (error) {
     console.error('✗ Lỗi khi tạo admin:', error.message);

@@ -127,7 +127,7 @@ const updateUserRole = async (req, res) => {
   try {
     const { userId } = req.params;
     const { role } = req.body;
-    if (!['user', 'admin'].includes(role)) {
+    if (!['admin', 'hr', 'manager', 'accountant', 'employee'].includes(role)) {
       return res.status(400).json({ success: false, message: 'Role không hợp lệ' });
     }
     const user = await User.findByPk(userId);
