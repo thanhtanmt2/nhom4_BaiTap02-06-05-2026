@@ -68,8 +68,11 @@ const getUsers = async (req, res) => {
     const { count: total, rows: users } = await User.findAndCountAll({
       where: whereClause,
       attributes: { exclude: ['password'] },
-      include: [Profile],
-      order: [['created_at', 'DESC']],
+      include: [
+        { model: Profile },
+        { model: Department, as: 'department', attributes: ['id', 'name'] },
+      ],
+      order: [['id', 'ASC']],
       limit: limitNum,
       offset,
     });
@@ -94,7 +97,10 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
+    const user = await User.findByPk(userId, { 
+      attributes: { exclude: ['password'] },
+      include: [{ model: Department, as: 'department', attributes: ['id', 'name'] }]
+    });
     if (!user) return res.status(404).json({ success: false, message: 'Người dùng không tồn tại' });
 
     const profile = await Profile.findOne({ where: { user_id: userId } });

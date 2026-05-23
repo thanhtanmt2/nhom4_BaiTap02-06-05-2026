@@ -74,15 +74,14 @@ const AdminUserDetail = () => {
     }
   };
 
-  const handleToggleRole = async () => {
-    if (!user) return;
-    const target = user.role === 'admin' ? 'user' : 'admin';
-    const confirmed = window.confirm(`Xác nhận đổi role thành "${target}"?`);
+  const handleRoleChange = async (newRole) => {
+    if (!user || user.role === newRole) return;
+    const confirmed = window.confirm(`Xác nhận đổi vai trò thành "${newRole}"?`);
     if (!confirmed) return;
     try {
       setActionLoading(true);
-      const res = await adminService.updateUserRole(user.id, target);
-      if (res.success) setUser((prev) => ({ ...prev, role: target }));
+      const res = await adminService.updateUserRole(user.id, newRole);
+      if (res.success) setUser((prev) => ({ ...prev, role: newRole }));
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Lỗi khi cập nhật role');
     } finally {
@@ -95,7 +94,7 @@ const AdminUserDetail = () => {
     : '';
 
   const displayName = profile?.full_name || user?.name || user?.email || '';
-  const department = user?.department || '—';
+  const department = user?.department?.name || '—';
   const createdAt = user?.created_at
     ? new Date(user.created_at).toLocaleString('vi-VN')
     : '—';
@@ -131,8 +130,19 @@ const AdminUserDetail = () => {
                 <Badge color={user.status === 'active' ? 'green' : 'red'}>
                   {user.status === 'active' ? 'Active' : 'Locked'}
                 </Badge>
-                <Badge color={user.role === 'admin' ? 'purple' : 'blue'}>
-                  {user.role === 'admin' ? 'Quản trị viên' : 'Người dùng'}
+                <Badge color={
+                  user.role === 'admin' ? 'purple' : 
+                  user.role === 'hr' ? 'blue' : 
+                  user.role === 'manager' ? 'red' : 
+                  user.role === 'accountant' ? 'green' : 'gray'
+                }>
+                  {{
+                    admin: 'Quản trị viên',
+                    hr: 'HR',
+                    manager: 'Quản lý',
+                    accountant: 'Kế toán',
+                    employee: 'Nhân viên'
+                  }[user.role] || user.role}
                 </Badge>
               </div>
               <div className="text-sm text-gray-500">{department}</div>
@@ -152,13 +162,18 @@ const AdminUserDetail = () => {
                 >
                   {user.status === 'active' ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
                 </Button>
-                <Button
-                  onClick={handleToggleRole}
+                <select
+                  value={user.role}
+                  onChange={(e) => handleRoleChange(e.target.value)}
                   disabled={actionLoading}
-                  className="w-auto! min-w-35"
+                  className="text-sm font-medium border border-gray-300 rounded-lg px-4 py-2 bg-white outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60 cursor-pointer"
                 >
-                  {user.role === 'admin' ? 'Đổi thành người dùng' : 'Đổi thành quản trị viên'}
-                </Button>
+                  <option value="employee">Nhân viên</option>
+                  <option value="hr">HR</option>
+                  <option value="manager">Quản lý</option>
+                  <option value="accountant">Kế toán</option>
+                  <option value="admin">Quản trị viên</option>
+                </select>
               </div>
             </div>
 
