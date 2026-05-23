@@ -31,9 +31,13 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: 'user',
     },
-    department: {
-      type: DataTypes.STRING(100),
+    department_id: {
+      type: DataTypes.INTEGER,
       allowNull: true,
+      references: {
+        model: 'departments',
+        key: 'id',
+      },
     },
     // Trạng thái tài khoản: inactive (chưa xác thực), active (đã xác thực)
     status: {
