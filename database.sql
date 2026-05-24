@@ -45,3 +45,21 @@ INSERT INTO users (name, email, password, role, department, is_active) VALUES
 -- Ghi chú: Thêm email thật của bạn vào đây để test gửi OTP
 -- INSERT INTO users (name, email, password, role, is_active) VALUES
 -- ('Tên Bạn', 'email_cua_ban@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lHerry', 'user', 1);
+
+-- ================================================
+-- Cấu hình tham số thuế và bảo hiểm
+-- ================================================
+CREATE TABLE IF NOT EXISTS tax_insurance_configs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    social_insurance_rate FLOAT DEFAULT 8.0,
+    health_insurance_rate FLOAT DEFAULT 1.5,
+    unemployment_insurance_rate FLOAT DEFAULT 1.0,
+    base_salary DECIMAL(15, 2) DEFAULT 2340000.00,
+    max_insurance_salary DECIMAL(15, 2) DEFAULT 46800000.00,
+    personal_deduction DECIMAL(15, 2) DEFAULT 11000000.00,
+    dependent_deduction DECIMAL(15, 2) DEFAULT 4400000.00,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Thêm dữ liệu mặc định ban đầu (chỉ 1 dòng)
+INSERT INTO tax_insurance_configs (id) VALUES (1) ON DUPLICATE KEY UPDATE id=1;

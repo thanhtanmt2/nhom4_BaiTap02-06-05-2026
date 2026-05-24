@@ -14,6 +14,7 @@ import UserProfile from './pages/user/UserProfile';
 import AdminProfile from './pages/admin/AdminProfile';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminUserDetail from './pages/admin/AdminUserDetail';
+import AdminConfig from './pages/admin/AdminConfig';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 import Layout from './components/Layout';
@@ -85,6 +86,7 @@ const App = () => {
         <Route path="profile" element={<AdminProfile />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="users/:id" element={<AdminUserDetail />} />
+        <Route path="config" element={<AdminConfig />} />
       </Route>
     </Routes>
   );

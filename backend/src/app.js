@@ -26,10 +26,12 @@ const authRoutes = require('./routes/auth.routes');
 const profileRoutes = require('./routes/profile.routes');
 const passwordRoutes = require('./routes/password.routes');
 const adminRoutes = require('./routes/admin.routes');
+const configRoutes = require('./routes/configRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', passwordRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/config', configRoutes);
 
 module.exports = app;

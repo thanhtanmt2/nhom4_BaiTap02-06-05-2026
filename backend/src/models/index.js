@@ -1,6 +1,7 @@
 const User = require('./User');
 const Profile = require('./Profile');
 const OTP = require('./OTP');
+const TaxInsuranceConfig = require('./TaxInsuranceConfig');
 
 // Define Associations
 User.hasOne(Profile, {
@@ -24,5 +25,6 @@ OTP.belongsTo(User, {
 module.exports = {
   User,
   Profile,
-  OTP
+  OTP,
+  TaxInsuranceConfig
 };
