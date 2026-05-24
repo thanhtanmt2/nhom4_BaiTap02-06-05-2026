@@ -34,6 +34,11 @@ const ActivityLog = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    is_read: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
