@@ -37,13 +37,6 @@ const getProfile = async (req, res) => {
       });
     }
 
-    await logActivity({
-      userId,
-      action: 'update_profile',
-      detail: 'Cập nhật thông tin profile',
-      req,
-    });
-
     return res.status(200).json({
       success: true,
       message: 'Lấy thông tin profile thành công',
@@ -98,8 +91,8 @@ const updateProfile = async (req, res) => {
 
     await logActivity({
       userId,
-      action: 'upload_avatar',
-      detail: 'Cập nhật ảnh đại diện',
+      action: 'update_profile',
+      detail: 'Cập nhật thông tin profile',
       req,
     });
 
