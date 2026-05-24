@@ -71,7 +71,9 @@ exports.verifyOTPAndResetPassword = async (email, otp, newPassword) => {
 
     return { 
       success: true,
-      message: 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.' 
+      message: 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.',
+      userId: user.id,
+      email: user.email,
     };
   } catch (error) {
     throw error;

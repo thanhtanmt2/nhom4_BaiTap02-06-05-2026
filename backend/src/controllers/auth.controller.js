@@ -5,6 +5,7 @@ const OTP = require('../models/OTP');
 const { loginValidation, registerValidation, verifyOtpValidation } = require('../validations/auth.validation');
 const { generateOTP, getOTPExpiryDate } = require('../utils/otp');
 const { sendOTPEmail } = require('../utils/mailer');
+const { logActivity } = require('../utils/activityLogger');
 
 // ============================================================
 // DANG NHAP
@@ -62,6 +63,12 @@ const login = async (req, res) => {
     }
 
     // Buoc 6: Tra ve Response thanh cong
+    await logActivity({
+      userId: user.id,
+      action: 'login',
+      detail: `Đăng nhập tài khoản ${user.email}`,
+      req,
+    });
     return res.status(200).json({
       success: true,
       message: 'Đăng nhập thành công',
@@ -137,6 +144,12 @@ const register = async (req, res) => {
     await sendOTPEmail(email, name, otpCode);
 
     // Buoc 8: Tra ve Response 201 thanh cong
+    await logActivity({
+      userId: newUser.id,
+      action: 'register',
+      detail: `Đăng ký tài khoản ${newUser.email}`,
+      req,
+    });
     return res.status(201).json({
       success: true,
       message: 'Đăng ký thành công! Vui lòng kiểm tra email để lấy mã OTP xác thực tài khoản.',
@@ -217,6 +230,13 @@ const verifyOtp = async (req, res) => {
 
     // Buoc 7: Cap nhat trang thai user thanh active
     await user.update({ status: 'active' });
+
+    await logActivity({
+      userId: user.id,
+      action: 'verify_otp',
+      detail: `Xác thực OTP cho tài khoản ${user.email}`,
+      req,
+    });
 
     // Buoc 8: Tra ve Response thanh cong
     return res.status(200).json({

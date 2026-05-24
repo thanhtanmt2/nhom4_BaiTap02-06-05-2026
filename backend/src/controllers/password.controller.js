@@ -1,5 +1,6 @@
 const passwordService = require('../services/password.service');
 const { forgotPasswordValidation, resetPasswordValidation } = require('../validations/password.validation');
+const { logActivity } = require('../utils/activityLogger');
 
 // Xử lý yêu cầu OTP quên mật khẩu
 exports.requestOTP = async (req, res) => {
@@ -41,8 +42,20 @@ exports.resetPassword = async (req, res) => {
 
     const { email, otp, newPassword } = value;
     const result = await passwordService.verifyOTPAndResetPassword(email, otp, newPassword);
-    
-    res.status(200).json(result);
+
+    if (result?.userId) {
+      await logActivity({
+        userId: result.userId,
+        action: 'reset_password',
+        detail: `Đổi mật khẩu tài khoản ${result.email || email}`,
+        req,
+      });
+    }
+
+    res.status(200).json({
+      success: result.success,
+      message: result.message,
+    });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || 'Lỗi server khi reset mật khẩu';

@@ -146,6 +146,30 @@ const formatDate = (dateStr) => {
   return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
+const formatDateTime = (dateStr) => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+const getRoleDotColor = (role) => {
+  const map = {
+    admin: 'bg-blue-500',
+    hr: 'bg-violet-500',
+    manager: 'bg-amber-500',
+    accountant: 'bg-teal-500',
+    employee: 'bg-gray-500',
+    user: 'bg-gray-500',
+  };
+  return map[role] || 'bg-gray-400';
+};
+
 // ── Component chính ──────────────────────────────────────────────────────────
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -169,6 +193,7 @@ const AdminDashboard = () => {
   }, []);
 
   const cards = getCards(stats);
+  const recentActivities = stats?.recentActivities || [];
   const now = new Date();
   const monthYear = now.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' });
 
@@ -370,43 +395,42 @@ const AdminDashboard = () => {
 
       </div>
 
-      {/* ── Widget Nhật ký hoạt động gần đây (Placeholder) ── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-dashed border-gray-200">
+      {/* ── Widget Nhật ký hoạt động gần đây ── */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold text-gray-800">Nhật ký hoạt động gần đây</h2>
             <p className="text-xs text-gray-400 mt-0.5">Lịch sử thao tác của tất cả vai trò trong hệ thống</p>
           </div>
-          <span className="text-xs bg-gray-100 text-gray-500 font-semibold px-2.5 py-1 rounded-full">Sắp có</span>
+          <span className="text-xs bg-gray-100 text-gray-600 font-semibold px-2.5 py-1 rounded-full">Top 10</span>
         </div>
-
-        {/* Placeholder log items */}
-        <div className="divide-y divide-gray-50">
-          {[
-            { color: 'bg-blue-400',   label: 'Admin', action: 'Khóa tài khoản',       time: '2 phút trước' },
-            { color: 'bg-violet-400', label: 'HR',    action: 'Tạo hồ sơ nhân viên',  time: '15 phút trước' },
-            { color: 'bg-amber-400',  label: 'Manager', action: 'Phê duyệt đơn nghỉ phép', time: '1 giờ trước' },
-            { color: 'bg-teal-400',   label: 'Kế toán', action: 'Tạo bảng lương tháng 5', time: '3 giờ trước' },
-            { color: 'bg-gray-400',   label: 'Employee', action: 'Gửi đơn xin nghỉ phép', time: 'Hôm qua' },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center gap-4 px-6 py-3.5 hover:bg-gray-50 transition-colors opacity-50">
-              {/* Dot màu vai trò */}
-              <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${item.color}`} />
-              {/* Badge role */}
-              <span className="text-xs font-semibold text-gray-500 w-16 shrink-0">{item.label}</span>
-              {/* Nội dung */}
-              <p className="text-sm text-gray-600 flex-1">{item.action}</p>
-              {/* Thời gian */}
-              <span className="text-xs text-gray-400 shrink-0">{item.time}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="px-6 py-3 border-t border-gray-50 text-center">
-          <p className="text-xs text-gray-400">
-            Dữ liệu minh họa · Chức năng thật sẽ khả dụng sau khi xây module Nhật ký
-          </p>
-        </div>
+        {recentActivities.length > 0 ? (
+          <div className="divide-y divide-gray-50">
+            {recentActivities.map((item) => {
+              const role = item.User?.role || 'user';
+              const actorLabel = item.User?.name || item.User?.email || 'Hệ thống';
+              const detail = item.detail || item.action;
+              return (
+                <div key={item.id} className="flex items-center gap-4 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+                  <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${getRoleDotColor(role)}`} />
+                  <span className="text-xs font-semibold text-gray-600 w-32 shrink-0 truncate" title={actorLabel}>
+                    {actorLabel}
+                  </span>
+                  <p className="text-sm text-gray-700 flex-1">
+                    {detail}
+                  </p>
+                  <span className="text-xs text-gray-400 shrink-0">
+                    {formatDateTime(item.created_at)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="px-6 py-8 text-center text-gray-400">
+            Chưa có hoạt động nào
+          </div>
+        )}
       </div>
 
       </div>

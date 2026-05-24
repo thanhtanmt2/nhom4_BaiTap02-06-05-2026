@@ -1,6 +1,8 @@
 const { Op } = require('sequelize');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
+const ActivityLog = require('../models/ActivityLog');
+const { logActivity } = require('../utils/activityLogger');
 
 // ============================================================
 // DASHBOARD ADMIN — Thống kê tổng quan
@@ -11,7 +13,7 @@ const getDashboardStats = async (req, res) => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const [totalUsers, activeUsers, lockedUsers, newUsersThisMonth, recentUsers] = await Promise.all([
+    const [totalUsers, activeUsers, lockedUsers, newUsersThisMonth, recentUsers, recentActivities] = await Promise.all([
       User.count(),
       User.count({ where: { status: 'active' } }),
       User.count({ where: { status: 'inactive' } }),
@@ -22,11 +24,17 @@ const getDashboardStats = async (req, res) => {
         order: [['created_at', 'DESC']],
         limit: 10,
       }),
+      ActivityLog.findAll({
+        attributes: ['id', 'action', 'detail', 'created_at'],
+        include: [{ model: User, attributes: ['id', 'name', 'email', 'role'] }],
+        order: [['created_at', 'DESC']],
+        limit: 10,
+      }),
     ]);
 
     return res.status(200).json({
       success: true,
-      data: { totalUsers, activeUsers, lockedUsers, newUsersThisMonth, recentUsers },
+      data: { totalUsers, activeUsers, lockedUsers, newUsersThisMonth, recentUsers, recentActivities },
     });
   } catch (error) {
     console.error('Dashboard Stats Error:', error);
@@ -115,6 +123,13 @@ const updateUserStatus = async (req, res) => {
     if (!user) return res.status(404).json({ success: false, message: 'Người dùng không tồn tại' });
 
     await user.update({ status });
+
+    await logActivity({
+      userId: req.user?.id,
+      action: 'admin_update_status',
+      detail: `Cập nhật trạng thái user ${user.email} -> ${status}`,
+      req,
+    });
     return res.status(200).json({ success: true, message: 'Cập nhật trạng thái thành công', data: { user } });
   } catch (error) {
     console.error('Update User Status Error:', error);
@@ -134,6 +149,13 @@ const updateUserRole = async (req, res) => {
     if (!user) return res.status(404).json({ success: false, message: 'Người dùng không tồn tại' });
 
     await user.update({ role });
+
+    await logActivity({
+      userId: req.user?.id,
+      action: 'admin_update_role',
+      detail: `Cập nhật role user ${user.email} -> ${role}`,
+      req,
+    });
     return res.status(200).json({ success: true, message: 'Cập nhật role thành công', data: { user } });
   } catch (error) {
     console.error('Update User Role Error:', error);
