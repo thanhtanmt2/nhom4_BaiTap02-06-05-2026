@@ -122,9 +122,9 @@ const AttendancePage = () => {
                 onClick={handleAction}
                 disabled={actionLoading}
                 className={`group relative w-48 h-48 rounded-full flex flex-col items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_40px_rgba(0,0,0,0.1)]
-                  ${todayStatus === 'idle' 
-                    ? 'bg-gradient-to-b from-brand-400 to-brand-600 hover:shadow-[0_0_60px_rgba(79,70,229,0.4)] hover:-translate-y-1' 
-                    : 'bg-gradient-to-b from-orange-400 to-orange-600 hover:shadow-[0_0_60px_rgba(249,115,22,0.4)] hover:-translate-y-1'
+                  ${todayStatus === 'idle'
+                    ? 'bg-gradient-to-b from-navy-600 to-navy-900 hover:shadow-[0_0_60px_rgba(11,31,61,0.4)] hover:-translate-y-1'
+                    : 'bg-gradient-to-b from-accent-500 to-accent-700 hover:shadow-[0_0_60px_rgba(245,158,11,0.4)] hover:-translate-y-1'
                   }`}
               >
                 <div className="absolute inset-1 rounded-full border-2 border-white/20"></div>

@@ -5,6 +5,7 @@ import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 
 const currentYear = new Date().getFullYear();
+const toNum = (v) => Number(v) || 0;
 
 const AccountantPayroll = () => {
   const [payrolls, setPayrolls] = useState([]);
@@ -193,8 +194,8 @@ const AccountantPayroll = () => {
                         </div>
                       </td>
                       <td className="px-4 text-[13px] text-gray-600">{Number(p.base_salary).toLocaleString()} đ</td>
-                      <td className="px-4 text-[13px] text-gray-600">{(Number(p.allowances) + Number(p.bonuses)).toLocaleString()} đ</td>
-                      <td className="px-4 text-[13px] text-danger-600">-{(Number(p.deductions) + Number(p.tax) + Number(p.insurance)).toLocaleString()} đ</td>
+                      <td className="px-4 text-[13px] text-gray-600">{(toNum(p.allowances) + toNum(p.bonuses)).toLocaleString()} đ</td>
+                      <td className="px-4 text-[13px] text-danger-600">-{(toNum(p.deductions) + toNum(p.tax) + toNum(p.insurance)).toLocaleString()} đ</td>
                       <td className="px-4 text-[13px] font-semibold text-success-600">{Number(p.net_salary).toLocaleString()} đ</td>
                       <td className="px-4">
                         <Badge variant={p.status === 'approved' ? 'success' : p.status === 'paid' ? 'brand' : 'neutral'} size="sm">

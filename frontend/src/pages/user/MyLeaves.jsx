@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import LeaveService from '../../services/leave.service';
 import { Plus, CalendarDays, Clock, CheckCircle, XCircle, FileText, X } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
+import { fmtDate as fmt } from '../../utils/format';
 
 const TYPE_BADGE = {
   leave: { label: 'Nghỉ phép', variant: 'warning' },
@@ -16,8 +17,6 @@ const STATUS_BADGE = {
 
 const inputClass = "w-full h-10 px-3 text-[13px] border border-gray-300 rounded-md bg-white placeholder-gray-400 focus:outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition-colors";
 const labelClass = "block text-[12px] font-medium text-gray-700 mb-1.5";
-
-const fmt = (d) => d ? new Date(d).toLocaleDateString('vi-VN') : '—';
 
 const INIT_FORM = {
   type: 'leave', start_date: '', end_date: '', total_days: '',
@@ -183,11 +182,11 @@ const MyLeaves = () => {
                       </td>
                       <td className="px-5">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-mono tabular-nums text-[12px] text-gray-700">{req.start_date}</span>
+                          <span className="font-mono tabular-nums text-[12px] text-gray-700">{fmt(req.start_date)}</span>
                           {req.start_date !== req.end_date && (
                             <>
                               <span className="text-gray-400 text-[11px]">→</span>
-                              <span className="font-mono tabular-nums text-[12px] text-gray-700">{req.end_date}</span>
+                              <span className="font-mono tabular-nums text-[12px] text-gray-700">{fmt(req.end_date)}</span>
                             </>
                           )}
                         </div>
@@ -235,7 +234,7 @@ const MyLeaves = () => {
 
               <div>
                 <label className={labelClass}>Loại đơn</label>
-                <select name="type" value={formData.type} onChange={handleChange} className={inputClass}>
+                <select id="type" name="type" value={formData.type} onChange={handleChange} className={inputClass}>
                   <option value="leave">Nghỉ phép</option>
                   <option value="ot">Làm thêm giờ (OT)</option>
                 </select>
@@ -245,11 +244,11 @@ const MyLeaves = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className={labelClass}>Từ ngày <span className="text-danger-500">*</span></label>
-                    <input type="date" name="start_date" value={formData.start_date} onChange={handleChange} required className={inputClass} />
+                    <input id="start_date" type="date" name="start_date" value={formData.start_date} onChange={handleChange} required className={inputClass} />
                   </div>
                   <div>
                     <label className={labelClass}>Đến ngày <span className="text-danger-500">*</span></label>
-                    <input type="date" name="end_date" value={formData.end_date} onChange={handleChange} required className={inputClass} />
+                    <input id="end_date" type="date" name="end_date" value={formData.end_date} onChange={handleChange} required className={inputClass} />
                   </div>
                   <div className="col-span-2">
                     <label className={labelClass}>Số ngày nghỉ (tự động)</label>
@@ -283,7 +282,7 @@ const MyLeaves = () => {
 
               <div>
                 <label className={labelClass}>Lý do chi tiết <span className="text-danger-500">*</span></label>
-                <textarea name="reason" value={formData.reason} onChange={handleChange} required rows={3}
+                <textarea id="reason" name="reason" value={formData.reason} onChange={handleChange} required rows={3}
                   placeholder="Ghi rõ lý do..."
                   className="w-full px-3 py-2.5 text-[13px] border border-gray-300 rounded-md bg-white placeholder-gray-400 focus:outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition-colors resize-none" />
               </div>

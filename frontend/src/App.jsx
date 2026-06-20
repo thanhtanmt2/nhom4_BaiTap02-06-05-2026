@@ -41,6 +41,8 @@ import AdvancesPage from './pages/accountant/AdvancesPage';
 
 import Layout from './components/Layout';
 import PerformanceDashboard from './pages/user/PerformanceDashboard';
+import UserToday from './pages/user/UserToday';
+import HRInterviews from './pages/hr/HRInterviews';
 
 // Redirect /profile đến đúng dashboard theo role
 const RoleRedirect = () => {
@@ -95,6 +97,7 @@ const App = () => {
           </ProtectedRoute>
         }
       >
+        <Route path="today"       element={<UserToday />} />
         <Route path="profile"     element={<UserProfile />} />
         <Route path="leaves"      element={<MyLeaves />} />
         <Route path="attendance"  element={<AttendancePage />} />
@@ -155,6 +158,7 @@ const App = () => {
         <Route path="evaluation"  element={<EmployeeEvaluation />} />
         <Route path="promotions"  element={<PromotionManager />} />
         <Route path="recruitment" element={<RecruitmentPage />} />
+        <Route path="interviews"  element={<HRInterviews />} />
       </Route>
 
       {/* Admin dashboard */}

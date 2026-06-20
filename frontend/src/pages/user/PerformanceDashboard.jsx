@@ -71,7 +71,7 @@ const PerformanceDashboard = () => {
             {[
               { label: 'Tổng giao',   value: taskStats.total,      },
               { label: 'Hoàn thành',  value: taskStats.completed,  success: true },
-              { label: 'Trễ hạn',     value: taskStats.overdue,    danger: true },
+              { label: 'Trễ hạn',     value: taskStats.overdue ?? 0,    danger: true },
               { label: 'Đang làm',    value: taskStats.inProgress, brand: true },
             ].map(k => (
               <div key={k.label} className="p-4">
