@@ -20,4 +20,18 @@ router.post('/avatar', authenticateToken, upload.single('avatar'), uploadAvatar)
 router.get('/my-payslips/list', authenticateToken, accountantController.getMyPayslips);
 router.get('/:userId', authenticateToken, authorizeAdmin, getProfileById);
 
+// Error handling middleware for profile routes (e.g. Multer size limit)
+router.use((err, req, res, next) => {
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({
+      success: false,
+      message: 'Dung lượng ảnh không được vượt quá 2MB',
+    });
+  }
+  return res.status(400).json({
+    success: false,
+    message: err.message || 'Lỗi khi tải ảnh lên',
+  });
+});
+
 module.exports = router;

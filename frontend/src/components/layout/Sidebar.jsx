@@ -241,7 +241,11 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="border-t border-white/[.06] px-4 py-2.5 flex items-center gap-2 shrink-0">
-        <Avatar name={displayName} size="sm" />
+        <Avatar
+          name={displayName}
+          src={user?.avatar_url ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000'}${user.avatar_url}` : null}
+          size="sm"
+        />
         <div className="flex-1 min-w-0">
           <div className="text-[11px] font-medium text-white truncate">{displayName}</div>
           <div className="text-[10px] text-white/40 mt-0.5">{config.roleLabel}</div>

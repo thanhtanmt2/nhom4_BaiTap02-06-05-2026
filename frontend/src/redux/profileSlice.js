@@ -31,7 +31,11 @@ export const uploadAvatarThunk = createAsyncThunk(
     try {
       const fd = new FormData();
       fd.append('avatar', file);
-      const res = await axiosClient.post('/profile/avatar', fd);
+      const res = await axiosClient.post('/profile/avatar', fd, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       return res.data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Upload ảnh thất bại');

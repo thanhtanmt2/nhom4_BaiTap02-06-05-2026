@@ -37,3 +37,21 @@ frontend/public/models/
 # Excel files
 *.xlsx
 ~$*.xlsx
+
+# Test cases & Excel helper scripts
+CHƯƠNG_4_KIỂM_THỬ_HỘP_ĐEN.md
+all_cases_summary.md
+backend/CHƯƠNG_4_KIỂM_THỬ_HỘP_ĐEN.md
+backend/all_cases_summary.md
+backend/all_testcases.json
+backend/extract_tc_list.js
+backend/generate_chapter4_text.js
+backend/print_fails.js
+backend/print_raw_fails.js
+backend/print_tc006.js
+backend/read_all_cases.js
+backend/read_excel_temp.js
+backend/summarize_all_cases.js
+
+# Uploaded files
+backend/uploads/

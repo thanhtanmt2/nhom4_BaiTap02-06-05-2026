@@ -12,7 +12,7 @@ import {
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 
-const BACKEND = 'http://localhost:3000';
+const BACKEND = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
 
 const PHONE_REGEX = /^0\d{9,10}$/;
 
@@ -64,10 +64,25 @@ const UserProfile = () => {
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Kiểm tra dung lượng file ở phía client (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      dispatch(clearProfileMessages());
+      setLocalError('Dung lượng ảnh không được vượt quá 2MB');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    setLocalError('');
+    const prevPreview = avatarPreview;
     setAvatarPreview(URL.createObjectURL(file));
+
     const result = await dispatch(uploadAvatarThunk(file));
     if (uploadAvatarThunk.fulfilled.match(result)) {
       setAvatarPreview(`${BACKEND}${result.payload.avatar_url}`);
+      dispatch(updateProfile({ avatar_url: result.payload.avatar_url }));
+    } else {
+      setAvatarPreview(prevPreview);
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
   };

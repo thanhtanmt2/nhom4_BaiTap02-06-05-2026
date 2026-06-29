@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { User, OTP } = require('../entities');
+const { User, OTP, Profile } = require('../entities');
 const { loginValidation, registerValidation, verifyOtpValidation } = require('../validations/auth.validation');
 const { generateOTP, getOTPExpiryDate } = require('../utils/otp');
 const { sendOTPEmail } = require('../utils/mailer');
@@ -64,7 +64,10 @@ const login = async (req, res) => {
     };
     const redirectUrl = ROLE_REDIRECT[user.role] || '/user/today';
 
-    // Buoc 6: Tra ve Response thanh cong
+    // Buoc 6: Lay thong tin avatar tu profile
+    const profile = await Profile.findOne({ where: { user_id: user.id } });
+
+    // Buoc 7: Tra ve Response thanh cong
     await logActivity({
       userId: user.id,
       action: 'login',
@@ -81,6 +84,7 @@ const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar_url: profile?.avatar_url || null,
       },
     });
   } catch (error) {

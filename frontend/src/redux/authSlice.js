@@ -7,7 +7,10 @@ export const fetchMeThunk = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await axiosClient.get('/profile/');
-      return res.data.data.user;
+      return {
+        ...res.data.data.user,
+        avatar_url: res.data.data.profile?.avatar_url || null
+      };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Phiên đăng nhập hết hạn');
     }
