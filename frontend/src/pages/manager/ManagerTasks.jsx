@@ -48,7 +48,8 @@ const ManagerTasks = () => {
   const loadEmployees = async () => {
     try {
       const res = await hrService.getAllEmployees();
-      if (res.data?.success) setEmployees(res.data.data || []);
+      const list = res.data?.employees || res.data?.data || res.data || [];
+      setEmployees(Array.isArray(list) ? list : []);
     } catch { /* silent */ }
   };
 

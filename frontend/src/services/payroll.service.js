@@ -12,7 +12,10 @@ const payrollService = {
   },
   approvePayroll: (month) => {
     return axiosClient.put('/payrolls/approve', { month });
-  }
+  },
+  payPayroll: (month) => {
+    return axiosClient.put('/payrolls/pay', { month });
+  },
 };
 
 export default payrollService;

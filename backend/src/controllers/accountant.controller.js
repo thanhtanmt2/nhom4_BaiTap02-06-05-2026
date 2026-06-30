@@ -1,4 +1,4 @@
-const { Payroll, User, Profile } = require('../entities');
+const { Payroll, User, Profile, SalaryAdjustment } = require('../entities');
 const { sendPayslipEmail } = require('../utils/mailer');
 const { Op } = require('sequelize');
 const XLSX = require('xlsx');
@@ -18,7 +18,7 @@ const getPayrolls = async (req, res) => {
       whereClause.month = month;
     }
 
-    const payrolls = await Payroll.findAll({
+    const payrollRows = await Payroll.findAll({
       where: whereClause,
       include: [
         {
@@ -36,10 +36,39 @@ const getPayrolls = async (req, res) => {
       order: [['month', 'DESC'], ['id', 'ASC']]
     });
 
+    // Override allowance/bonus từ salary_adjustments (nguồn thực tế)
+    const monthKey = whereClause.month;
+    let adjMap = {};
+    if (monthKey) {
+      const adjs = await SalaryAdjustment.findAll({
+        where: { apply_month: monthKey, status: 'applied', kind: 'income' },
+        attributes: ['user_id', 'category', 'amount'],
+      });
+      adjs.forEach(adj => {
+        const uid = adj.user_id;
+        if (!adjMap[uid]) adjMap[uid] = { allowance: 0, bonus: 0 };
+        const cat = (adj.category || '').toLowerCase();
+        if (cat.includes('ph\u1ee5 c\u1ea5p') || cat.includes('allowance')) {
+          adjMap[uid].allowance += Number(adj.amount);
+        } else {
+          adjMap[uid].bonus += Number(adj.amount);
+        }
+      });
+    }
+
+    const payrolls = payrollRows.map(p => {
+      const raw = p.toJSON ? p.toJSON() : { ...p };
+      if (adjMap[raw.user_id]) {
+        raw.allowance = adjMap[raw.user_id].allowance;
+        raw.bonus     = adjMap[raw.user_id].bonus;
+      }
+      return raw;
+    });
+
     res.json({ success: true, payrolls });
   } catch (error) {
     console.error('Error in getPayrolls:', error);
-    res.status(500).json({ success: false, message: 'Lỗi server' });
+    res.status(500).json({ success: false, message: 'L\u1ed7i server' });
   }
 };
 
@@ -54,7 +83,7 @@ const exportBankFile = async (req, res) => {
     const mm = String(month).padStart(2, '0');
     const monthKey = `${year}-${mm}`;
 
-    const payrolls = await Payroll.findAll({
+    const payrollRows = await Payroll.findAll({
       where: {
         month: monthKey,
         status: { [Op.in]: ['approved', 'paid'] }
@@ -74,14 +103,40 @@ const exportBankFile = async (req, res) => {
       ]
     });
 
-    if (!payrolls || payrolls.length === 0) {
-      return res.status(404).json({ success: false, message: 'Không tìm thấy dữ liệu lương đã duyệt cho tháng này.' });
+    if (!payrollRows || payrollRows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Kh\u00f4ng t\u00ecm th\u1ea5y d\u1eef li\u1ec7u l\u01b0\u01a1ng \u0111\u00e3 duy\u1ec7t cho th\u00e1ng n\u00e0y.' });
     }
 
+    // Lấy allowance/bonus thực từ salary_adjustments
+    const adjsExport = await SalaryAdjustment.findAll({
+      where: { apply_month: monthKey, status: 'applied', kind: 'income' },
+      attributes: ['user_id', 'category', 'amount'],
+    });
+    const adjMapExport = {};
+    adjsExport.forEach(adj => {
+      const uid = adj.user_id;
+      if (!adjMapExport[uid]) adjMapExport[uid] = { allowance: 0, bonus: 0 };
+      const cat = (adj.category || '').toLowerCase();
+      if (cat.includes('ph\u1ee5 c\u1ea5p') || cat.includes('allowance')) {
+        adjMapExport[uid].allowance += Number(adj.amount);
+      } else {
+        adjMapExport[uid].bonus += Number(adj.amount);
+      }
+    });
+
+    const payrolls = payrollRows.map(p => {
+      const raw = p.toJSON ? p.toJSON() : { ...p };
+      if (adjMapExport[raw.user_id]) {
+        raw.allowance = adjMapExport[raw.user_id].allowance;
+        raw.bonus     = adjMapExport[raw.user_id].bonus;
+      }
+      return raw;
+    });
+
     const headers = [
-      'STT', 'Họ và tên', 'Số tài khoản', 'Ngân hàng', 'Tên chủ TK',
-      'Lương cơ bản', 'Phụ cấp', 'Thưởng', 'Khấu trừ',
-      'Thuế TNCN', 'Bảo hiểm NV', 'Thực lãnh', 'Nội dung CK'
+      'STT', 'H\u1ecd v\u00e0 t\u00ean', 'S\u1ed1 t\u00e0i kho\u1ea3n', 'Ng\u00e2n h\u00e0ng', 'T\u00ean ch\u1ee7 TK',
+      'L\u01b0\u01a1ng c\u01a1 b\u1ea3n', 'Ph\u1ee5 c\u1ea5p', 'Th\u01b0\u1edfng', 'Kh\u1ea5u tr\u1eeb',
+      'Thu\u1ebf TNCN', 'B\u1ea3o hi\u1ec3m NV', 'Th\u1ef1c l\u00e3nh', 'N\u1ed9i dung CK'
     ];
 
     const wsData = [headers];

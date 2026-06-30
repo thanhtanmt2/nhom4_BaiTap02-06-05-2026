@@ -47,6 +47,7 @@ import Layout from './components/Layout';
 import PublicLayout from './components/PublicLayout';
 import PerformanceDashboard from './pages/user/PerformanceDashboard';
 import UserToday from './pages/user/UserToday';
+import MyAdvances from './pages/user/MyAdvances';
 import HRInterviews from './pages/hr/HRInterviews';
 import JobListPage from './pages/public/JobListPage';
 import JobDetailApplyPage from './pages/public/JobDetailApplyPage';
@@ -118,6 +119,7 @@ const App = () => {
         <Route path="payslip"     element={<Payslip />} />
         <Route path="tasks"       element={<UserTasks />} />
         <Route path="performance" element={<PerformanceDashboard />} />
+        <Route path="advances"    element={<MyAdvances />} />
       </Route>
 
       {/* Manager dashboard */}

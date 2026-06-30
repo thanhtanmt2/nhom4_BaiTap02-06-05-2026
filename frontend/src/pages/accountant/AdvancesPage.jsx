@@ -740,12 +740,6 @@ export default function AdvancesPage() {
         <div className="px-5 pt-5 pb-3 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center justify-between mb-1">
             <h1 className="text-[20px] font-semibold text-gray-900">Tạm ứng lương</h1>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="h-8 px-2.5 flex items-center gap-1.5 text-[12px] font-medium bg-amber-600 hover:bg-amber-700 text-white rounded-md transition-colors"
-            >
-              <Plus size={13} /> Tạo đơn
-            </button>
           </div>
           <p className="text-[13px] text-gray-500">Tháng {new Date().toLocaleDateString('vi-VN', { month: 'numeric', year: 'numeric' })}</p>
 
@@ -863,15 +857,6 @@ export default function AdvancesPage() {
           onConfirm={handleRejectConfirm}
           onClose={() => { setShowRejectModal(false); setRejectTarget(null); }}
           loading={submitting}
-        />
-      )}
-
-      {/* Create modal */}
-      {showCreateModal && (
-        <CreateModal
-          employees={employees}
-          onClose={() => setShowCreateModal(false)}
-          onCreated={handleCreated}
         />
       )}
 

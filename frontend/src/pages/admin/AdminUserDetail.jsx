@@ -250,10 +250,6 @@ const AdminUserDetail = () => {
                       {isActive ? <Lock size={13} strokeWidth={1.75} /> : <Unlock size={13} strokeWidth={1.75} />}
                       {isActive ? 'Khóa TK' : 'Mở khóa'}
                     </button>
-                    <button className="h-8 px-3 flex items-center gap-1.5 text-[12px] font-semibold bg-accent-600 hover:bg-accent-700 text-white rounded-md transition-colors">
-                      <Pencil size={13} strokeWidth={2} />
-                      Chỉnh sửa
-                    </button>
                   </>
                 )}
               </div>

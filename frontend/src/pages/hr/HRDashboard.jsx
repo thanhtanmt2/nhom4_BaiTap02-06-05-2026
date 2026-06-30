@@ -27,16 +27,23 @@ const HRDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({ email: '', full_name: '', role: 'employee', department_id: '' });
-  const [activeEventTab, setActiveEventTab] = useState('birthday');
+  const [activeEventTab, setActiveEventTab] = useState('anniversary');
+  const [dashboardEvents, setDashboardEvents] = useState([]);
+  const [dashboardInterviews, setDashboardInterviews] = useState([]);
 
   const fetchData = async () => {
     try {
-      const [reqRes, depRes] = await Promise.all([
+      const [reqRes, depRes, dashRes] = await Promise.all([
         axios.get(`${BACKEND_URL}/api/hr/account-requests`, { headers: { Authorization: `Bearer ${token}` } }),
         axios.get(`${BACKEND_URL}/api/admin/departments`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${BACKEND_URL}/api/hr/dashboard`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       if (reqRes.data.success) setRequests(reqRes.data.data);
       if (depRes.data.success) setDepartments(depRes.data.data.filter((d) => d.status === 'active'));
+      if (dashRes.data.success) {
+        setDashboardEvents(dashRes.data.data.events || []);
+        setDashboardInterviews(dashRes.data.data.interviews || []);
+      }
     } catch { /* silent */ }
     finally { setLoading(false); }
   };
@@ -151,11 +158,11 @@ const HRDashboard = () => {
         <div className="col-span-3 bg-white border border-gray-200 rounded-lg p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-[15px] font-semibold text-gray-900">Sự kiện tuần này</h2>
-            <Badge variant="accent">5 sự kiện</Badge>
+            <Badge variant="accent">{dashboardEvents.length} sự kiện</Badge>
           </div>
           {/* Tabs pill */}
           <div className="flex gap-1 p-0.5 bg-gray-100 rounded-md w-fit mb-4">
-            {[{ key: 'birthday', label: 'Sinh nhật (3)' }, { key: 'anniversary', label: 'Kỷ niệm (2)' }].map((tab) => (
+            {[{ key: 'anniversary', label: `Kỷ niệm (${dashboardEvents.length})` }].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveEventTab(tab.key)}
@@ -168,20 +175,20 @@ const HRDashboard = () => {
             ))}
           </div>
           <div className="space-y-2">
-            {[
-              { name: 'Trần Thị Hương', date: '22/05 · Thứ Sáu · 30 tuổi', daysLeft: 2 },
-              { name: 'Lê Minh Đức',    date: '24/05 · Chủ Nhật · 35 tuổi', daysLeft: 4 },
-              { name: 'Đỗ Thị Lan',     date: '26/05 · Thứ Ba · 28 tuổi',   daysLeft: 6 },
-            ].map((person) => (
+            {dashboardEvents.length > 0 ? dashboardEvents.map((person) => (
               <div key={person.name} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
                 <Avatar name={person.name} size="md" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-medium text-gray-900">{person.name}</p>
                   <p className="text-[11px] text-gray-500 mt-0.5">{person.date}</p>
                 </div>
-                <Badge variant="neutral" size="sm">Còn {person.daysLeft} ngày</Badge>
+                <Badge variant="neutral" size="sm">
+                  {person.daysLeft === 0 ? 'Hôm nay' : `Còn ${person.daysLeft} ngày`}
+                </Badge>
               </div>
-            ))}
+            )) : (
+              <div className="text-center py-4 text-[13px] text-gray-400">Không có sự kiện nào tuần này.</div>
+            )}
           </div>
           <button className="mt-4 w-full h-8 text-[13px] text-gray-500 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
             Gửi lời chúc tự động
@@ -194,7 +201,7 @@ const HRDashboard = () => {
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <h2 className="text-[15px] font-semibold text-gray-900">Phỏng vấn hôm nay</h2>
-            <Badge variant="brand">3 lịch</Badge>
+            <Badge variant="brand">{dashboardInterviews.length} lịch</Badge>
           </div>
           <button onClick={() => navigate('/hr/interviews')} className="text-[13px] text-accent-600 hover:underline">
             Xem lịch tuần →
@@ -213,13 +220,11 @@ const HRDashboard = () => {
           <tbody>
             {loading ? (
               <tr><td colSpan={5} className="px-4 py-8 text-center text-[13px] text-gray-400">Đang tải...</td></tr>
+            ) : dashboardInterviews.length === 0 ? (
+              <tr><td colSpan={5} className="px-4 py-8 text-center text-[13px] text-gray-400">Không có lịch phỏng vấn nào hôm nay.</td></tr>
             ) : (
-              [
-                { time: '09:00', name: 'Nguyễn Thị Linh', round: 'Vòng 1', interviewer: 'Lê Minh Đức', mode: 'Online' },
-                { time: '14:00', name: 'Trần Văn Bảo',    round: 'Vòng 2', interviewer: 'Nguyễn Văn An', mode: 'Trực tiếp' },
-                { time: '15:30', name: 'Lê Thanh Tùng',   round: 'Vòng 1', interviewer: 'Phạm Quỳnh Anh', mode: 'Online' },
-              ].map((row) => (
-                <tr key={row.time} className="h-14 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              dashboardInterviews.map((row, idx) => (
+                <tr key={idx} className="h-14 border-b border-gray-100 hover:bg-gray-50 transition-colors">
                   <td className="px-4 font-mono tabular-nums text-[13px] text-gray-700">{row.time}</td>
                   <td className="px-4">
                     <div className="flex items-center gap-2">

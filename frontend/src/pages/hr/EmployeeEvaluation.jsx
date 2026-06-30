@@ -43,7 +43,21 @@ const EmployeeEvaluation = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let updates = { [name]: value };
+
+    // Tự động tính xếp loại dựa trên điểm KPI
+    if (name === 'kpi_score') {
+      const kpi = parseFloat(value);
+      if (!isNaN(kpi)) {
+        if (kpi >= 90) updates.rating = 'A';
+        else if (kpi >= 70) updates.rating = 'B';
+        else if (kpi >= 50) updates.rating = 'C';
+        else updates.rating = 'D';
+      }
+    }
+
+    setFormData(prev => ({ ...prev, ...updates }));
   };
 
   const handleSubmit = async (e) => {
@@ -70,6 +84,9 @@ const EmployeeEvaluation = () => {
       setMessage('Đánh giá đã được lưu thành công!');
       setMessageType('success');
       setFormData(prev => ({ ...prev, user_id: '', kpi_score: '', comments: '' }));
+      
+      // Reload danh sách nhân viên để cập nhật trạng thái mới
+      fetchEmployees();
     } catch (error) {
       console.error(error);
       setMessage('Có lỗi xảy ra khi lưu đánh giá.');
@@ -85,6 +102,14 @@ const EmployeeEvaluation = () => {
   const now = new Date();
   const deadlineDays = 25 - now.getDate();
   const isNearDeadline = deadlineDays >= 0 && deadlineDays <= 7;
+
+  const filteredEmployees = employees.filter(emp => {
+    if (filterTab === 'Tất cả') return true;
+    if (filterTab === 'Chờ đánh giá') return !emp.latest_rating;
+    if (filterTab === 'Đã chốt') return !!emp.latest_rating;
+    if (filterTab === 'Cần chú ý') return emp.latest_rating === 'D' || (emp.latest_kpi_score != null && emp.latest_kpi_score < 50);
+    return true;
+  });
 
   return (
     <div className="space-y-5">
@@ -127,8 +152,8 @@ const EmployeeEvaluation = () => {
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Tổng nhân viên',   value: employees.length,  sub: 'cần đánh giá' },
-          { label: 'Đã đánh giá',       value: 0,                sub: 'kỳ này', neutral: true },
-          { label: 'Chưa đánh giá',     value: employees.length, sub: 'còn lại', warning: employees.length > 0 },
+          { label: 'Đã đánh giá',       value: employees.filter(e => e.latest_rating).length, sub: 'kỳ này', neutral: true },
+          { label: 'Chưa đánh giá',     value: employees.length - employees.filter(e => e.latest_rating).length, sub: 'còn lại', warning: (employees.length - employees.filter(e => e.latest_rating).length) > 0 },
         ].map(k => (
           <div key={k.label} className="bg-white border border-gray-200 rounded-lg p-4">
             <p className="text-[10px] font-semibold uppercase tracking-[.06em] text-gray-400 mb-2">{k.label}</p>
@@ -181,14 +206,14 @@ const EmployeeEvaluation = () => {
                 </tr>
               </thead>
               <tbody>
-                {employees.length === 0 ? (
+                {filteredEmployees.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-10 text-center text-[13px] text-gray-400">
                       Không có nhân viên nào.
                     </td>
                   </tr>
                 ) : (
-                  employees.map(emp => (
+                  filteredEmployees.map(emp => (
                     <tr
                       key={emp.id}
                       onClick={() => setFormData(p => ({ ...p, user_id: String(emp.id) }))}
@@ -260,12 +285,13 @@ const EmployeeEvaluation = () => {
                 name="rating"
                 value={formData.rating}
                 onChange={handleChange}
-                className={inputClass}
+                disabled
+                className={`${inputClass} bg-gray-100 cursor-not-allowed`}
               >
-                <option value="A">A · Xuất sắc</option>
-                <option value="B">B · Tốt</option>
-                <option value="C">C · Khá</option>
-                <option value="D">D · Cần cố gắng</option>
+                <option value="A">A · Xuất sắc (≥ 90)</option>
+                <option value="B">B · Tốt (70 - 89)</option>
+                <option value="C">C · Khá (50 - 69)</option>
+                <option value="D">D · Cần cố gắng (&lt; 50)</option>
               </select>
             </div>
             <div>

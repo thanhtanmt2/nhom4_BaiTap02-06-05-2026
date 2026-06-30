@@ -383,3 +383,81 @@ exports.unlockAttendance = async (req, res) => {
   }
 };
 
+exports.getDashboardData = async (req, res) => {
+  try {
+    const { User, Candidate, Profile, Contract } = require('../entities');
+    const { Op } = require('sequelize');
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
+    // 1. Phỏng vấn hôm nay
+    const interviews = await Candidate.findAll({
+      where: {
+        interview_date: { [Op.gte]: today, [Op.lt]: tomorrow },
+        stage: { [Op.in]: ['iv1', 'iv2'] }
+      },
+      order: [['interview_date', 'ASC']]
+    });
+
+    // 2. Kỷ niệm (Anniversaries in the next 7 days)
+    const users = await User.findAll({
+      attributes: ['id', 'name', 'created_at'],
+      where: {
+        role: { [Op.ne]: 'admin' },
+        status: 'active'
+      }
+    });
+
+    const events = users.map(u => {
+      const joinDate = new Date(u.created_at);
+      // Calculate anniversary this year
+      const anniversary = new Date(today.getFullYear(), joinDate.getMonth(), joinDate.getDate());
+      if (anniversary < today) {
+        anniversary.setFullYear(today.getFullYear() + 1);
+      }
+      
+      const diffTime = anniversary - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays <= 7 && diffDays >= 0) {
+        const years = anniversary.getFullYear() - joinDate.getFullYear();
+        if (years > 0) {
+          return {
+            name: u.name,
+            date: `${anniversary.getDate()}/${anniversary.getMonth() + 1} - ${years} năm`,
+            daysLeft: diffDays,
+            type: 'anniversary'
+          };
+        }
+      }
+      return null;
+    }).filter(Boolean);
+
+    // sort events by daysLeft
+    events.sort((a, b) => a.daysLeft - b.daysLeft);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        interviews: interviews.map(i => ({
+          time: new Date(i.interview_date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+          name: i.name,
+          round: i.stage === 'iv1' ? 'Vòng 1' : 'Vòng 2',
+          interviewer: i.interviewer || 'N/A',
+          mode: (i.interview_link && i.interview_link.startsWith('http')) ? 'Online' : 'Trực tiếp'
+        })),
+        events
+      }
+    });
+
+  } catch (err) {
+    console.error('Lỗi khi lấy dữ liệu dashboard HR:', err);
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};

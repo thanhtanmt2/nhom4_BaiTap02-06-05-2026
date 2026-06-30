@@ -198,21 +198,7 @@ const Login = () => {
               {loading ? 'Đang xử lý...' : 'Đăng nhập'}
             </button>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-[.06em]">Hoặc</span>
-              <div className="flex-1 h-px bg-gray-200" />
-            </div>
 
-            {/* SSO */}
-            <button
-              type="button"
-              className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-md text-[14px] font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
-            >
-              <Building2 size={16} strokeWidth={1.75} className="text-gray-400" />
-              Đăng nhập bằng SSO công ty
-            </button>
           </form>
 
           <p className="mt-6 text-center text-[13px] text-gray-500">

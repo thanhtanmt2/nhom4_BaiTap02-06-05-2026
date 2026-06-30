@@ -1,5 +1,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { LeaveBalance, LeaveRequest, Task, Payroll, User, Candidate, Department } = require('../entities');
+const fs = require('fs');
+const path = require('path');
 const { Op } = require('sequelize');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -358,6 +360,19 @@ exports.chat = async (req, res) => {
         };
         break;
       }
+
+      case 'UNKNOWN':
+        try {
+          const logPath = path.join(__dirname, '../../unanswered_questions.txt');
+          const timestamp = new Date().toLocaleString('vi-VN');
+          const logEntry = `[${timestamp}] UserID: ${userId || 'Guest'} - Câu hỏi: ${message}\n`;
+          fs.appendFileSync(logPath, logEntry, 'utf8');
+          console.log('[Chatbot] Đã ghi câu hỏi không trả lời được vào file unanswered_questions.txt');
+        } catch (saveErr) {
+          console.error('[Chatbot] Lỗi khi ghi câu hỏi vào file:', saveErr.message);
+        }
+        data = null;
+        break;
 
       default:
         data = null;

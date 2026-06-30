@@ -224,7 +224,7 @@ const analyzeCV = async (req, res) => {
     await logActivity({
       userId: req.user?.id,
       action: 'analyze_cv',
-      detail: `Phân tích CV ${candidate.name} — Match Score: ${aiResult.match_score.toFixed(1)}/100`,
+      detail: `Phân tích CV ${candidate.name} — Match Score: ${aiResult.match_score.toFixed(1)}/5`,
       req,
     });
 

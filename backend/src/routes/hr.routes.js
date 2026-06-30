@@ -16,11 +16,24 @@ const authorizeHR = (req, res, next) => {
     return res.status(403).json({ success: false, message: 'Quyền truy cập bị từ chối. Cần quyền HR.' });
   }
 };
-router.use(authorizeHR);
+const authorizeHRManagerAdmin = (req, res, next) => {
+  if (req.user && ['hr', 'admin', 'manager'].includes(req.user.role)) {
+    next();
+  } else {
+    return res.status(403).json({ success: false, message: 'Quyền truy cập bị từ chối.' });
+  }
+};
 
+// Employees list (Manager cần gọi để assign task)
+router.get('/employees', authorizeHRManagerAdmin, hrContractController.getAllEmployees);
+
+router.use(authorizeHR);
 // Account Requests
 router.post('/account-requests', hrController.createAccountRequest);
 router.get('/account-requests', hrController.getMyAccountRequests);
+
+// Dashboard Data
+router.get('/dashboard', hrController.getDashboardData);
 
 // Update User Profile (Promotion/Transfer)
 router.put('/users/:id/profile', hrController.updateUserProfile);
@@ -33,8 +46,6 @@ router.put('/contracts/:contract_id', hrContractController.extendContract);
 router.delete('/contracts/:contract_id', hrContractController.deleteContract);
 router.put('/contracts/:id/renew', hrController.renewContract);
 
-// Employees list
-router.get('/employees', hrContractController.getAllEmployees);
 
 // Attendance report and locking
 router.get('/attendance/report', hrController.getAttendanceReport);

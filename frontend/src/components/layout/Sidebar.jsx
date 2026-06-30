@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   LayoutDashboard, Users, Building2, ClipboardList, UserSearch, Settings,
   UserCircle, FileText, CheckSquare, BarChart2, CalendarDays, LogOut,
-  Home, Clock, Wallet, Star, TrendingUp, PlusCircle, List
+  Home, Clock, Wallet, Star, TrendingUp, PlusCircle, List, Banknote
 } from 'lucide-react';
 import { logout } from '../../redux/authSlice';
 import Avatar from '../ui/Avatar';
@@ -66,6 +66,7 @@ const NAV_CONFIG = {
           { label: 'Chấm công',          path: '/user/attendance',    icon: Clock },
           { label: 'Hồ sơ tôi',          path: '/user/profile',       icon: UserCircle },
           { label: 'Đơn của tôi',        path: '/user/leaves',        icon: ClipboardList },
+          { label: 'Ứng lương',          path: '/user/advances',      icon: Banknote },
         ],
       },
     ],
@@ -100,7 +101,7 @@ const NAV_CONFIG = {
         items: [
           { label: 'Chấm công',          path: '/user/attendance',    icon: Clock },
           { label: 'Hồ sơ tôi',          path: '/user/profile',       icon: UserCircle },
-          { label: 'Đơn của tôi',        path: '/user/leaves',        icon: ClipboardList },
+          { label: 'Ứng lương',          path: '/user/advances',      icon: Banknote },
         ],
       },
     ],
@@ -151,6 +152,7 @@ const NAV_CONFIG = {
           { label: 'Phiếu lương',        path: '/user/payslip',       icon: Wallet },
           { label: 'Task của tôi',       path: '/user/tasks',         icon: ClipboardList },
           { label: 'Hiệu quả làm việc',  path: '/user/performance',   icon: BarChart2 },
+          { label: 'Ứng lương',          path: '/user/advances',      icon: Banknote },
           { label: 'Hồ sơ tôi',          path: '/user/profile',       icon: UserCircle },
         ],
       },
@@ -173,6 +175,7 @@ const NAV_CONFIG = {
           { label: 'Phiếu lương',        path: '/user/payslip',       icon: Wallet },
           { label: 'Task của tôi',       path: '/user/tasks',         icon: ClipboardList },
           { label: 'Hiệu quả làm việc',  path: '/user/performance',   icon: BarChart2 },
+          { label: 'Ứng lương',          path: '/user/advances',      icon: Banknote },
           { label: 'Hồ sơ tôi',          path: '/user/profile',       icon: UserCircle },
         ],
       },

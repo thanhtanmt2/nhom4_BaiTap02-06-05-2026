@@ -54,6 +54,22 @@ const generateCode = async () => {
   return `${prefix}${String(seq).padStart(4, '0')}`;
 };
 
+// ── GET /api/advances/my-requests ──────────────────────────────────────────────
+exports.getMyRequests = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const requests = await AdvanceRequest.findAll({
+      where: { user_id: userId },
+      include: [ reviewerInclude ],
+      order: [['created_at', 'DESC']],
+    });
+    res.json({ success: true, data: requests.map(mapAdvance) });
+  } catch (error) {
+    console.error('getMyRequests error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách ứng lương' });
+  }
+};
+
 // ── GET /api/advances ─────────────────────────────────────────────────────────
 // Query: status, search (tên nhân viên)
 exports.getAll = async (req, res) => {
@@ -82,7 +98,7 @@ exports.getAll = async (req, res) => {
     const mapped = rows.map(mapAdvance);
     return res.json({ success: true, data: mapped, total: count, page, totalPages: Math.ceil(count / limit) });
   } catch (err) {
-    console.error('getAll advances error:', err);
+    console.error('getAll advance error:', err);
     return res.status(500).json({ success: false, message: 'Lỗi server' });
   }
 };
@@ -98,6 +114,68 @@ exports.getOne = async (req, res) => {
   } catch (err) {
     console.error('getOne advance error:', err);
     return res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+// ── POST /api/advances/request ────────────────────────────────────────────────
+// Cho phép nhân viên tự tạo đơn ứng lương
+exports.requestAdvance = async (req, res) => {
+  try {
+    const { amount, reason, urgent } = req.body;
+    const userId = req.user.id;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ success: false, message: 'Số tiền không hợp lệ' });
+    }
+    if (!reason || reason.trim() === '') {
+      return res.status(400).json({ success: false, message: 'Vui lòng nhập lý do' });
+    }
+
+    const code = await generateCode();
+    
+    // Check limit
+    const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1);
+    const sumRow = await AdvanceRequest.findAll({
+      where: { user_id: userId, status: { [Op.not]: 'rejected' }, created_at: { [Op.gte]: startOfYear } },
+      attributes: ['amount'],
+    });
+    const yearlyAdvanced = sumRow.reduce((s, r) => s + Number(r.amount), 0);
+    
+    let salary = 0;
+    const emp = await User.findByPk(userId, { include: [{ model: Contract, as: 'contracts', where: { status: 'active' }, required: false }] });
+    if (emp && emp.contracts && emp.contracts.length > 0) {
+      salary = emp.contracts[0].basic_salary;
+    }
+    const yearlyLimit = salary * 1; // 1 month limit
+
+    if (salary > 0 && yearlyAdvanced + Number(amount) > yearlyLimit) {
+      return res.status(400).json({
+        success: false,
+        message: `Vượt hạn mức năm. Đã ứng: ${yearlyAdvanced}, hạn mức: ${yearlyLimit}`
+      });
+    }
+
+    const newReq = await AdvanceRequest.create({
+      code,
+      user_id: userId,
+      amount,
+      monthly_salary: salary,
+      yearly_advanced: yearlyAdvanced,
+      yearly_limit: yearlyLimit,
+      reason,
+      urgent: !!urgent,
+      status: 'pending',
+    });
+
+    const fullReq = await AdvanceRequest.findByPk(newReq.id, {
+      include: [ employeeInclude, reviewerInclude ],
+    });
+
+    res.status(201).json({ success: true, data: mapAdvance(fullReq) });
+  } catch (error) {
+    console.error('requestAdvance error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi khi gửi yêu cầu ứng lương' });
   }
 };
 

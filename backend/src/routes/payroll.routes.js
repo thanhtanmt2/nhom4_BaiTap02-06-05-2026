@@ -18,4 +18,7 @@ router.post('/calculate', payrollController.calculatePayroll);
 // Duyệt lương cho một tháng
 router.put('/approve', payrollController.approvePayroll);
 
+// Thanh toán lương cho một tháng (approved → paid)
+router.put('/pay', payrollController.payPayroll);
+
 module.exports = router;

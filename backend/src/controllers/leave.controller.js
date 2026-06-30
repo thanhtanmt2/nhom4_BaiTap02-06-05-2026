@@ -195,8 +195,13 @@ exports.getPendingRequests = async (req, res) => {
         {
           model: User,
           as: 'requester',
-          attributes: ['name', 'email', 'department_id'],
-          where: { department_id: managerDeptId }
+          attributes: ['name', 'email', 'department_id', 'role'],
+          where: {
+            [Op.or]: [
+              { department_id: managerDeptId },
+              { role: 'hr' }
+            ]
+          }
         }
       ],
       order: [['created_at', 'ASC']]

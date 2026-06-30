@@ -58,17 +58,17 @@ function Avatar({ name, size = 28 }) {
   );
 }
 
-/* ── Score color (thang 0-100) ───────────────────────────── */
+/* ── Score color (thang 1-5) ───────────────────────────── */
 function scoreColor(s) {
-  if (s >= 80) return 'var(--rc-success)';
-  if (s >= 60) return 'var(--rc-success-soft)';
-  if (s >= 40) return 'var(--rc-warning)';
+  if (s >= 4.0) return 'var(--rc-success)';
+  if (s >= 3.0) return 'var(--rc-success-soft)';
+  if (s >= 2.0) return 'var(--rc-warning)';
   return 'var(--rc-gray-500)';
 }
 function scoreBg(s) {
-  if (s >= 80) return '#dcfce7';
-  if (s >= 60) return '#d1fae5';
-  if (s >= 40) return '#fef9c3';
+  if (s >= 4.0) return '#dcfce7';
+  if (s >= 3.0) return '#d1fae5';
+  if (s >= 2.0) return '#fef9c3';
   return '#f3f4f6';
 }
 
@@ -166,7 +166,7 @@ function CandidateCard({ candidate: c, dragging, selected, onSelect, onDragStart
       {/* AI Score Badge */}
       {hasScore ? (
         <div className="rc-ai-badge" style={{ background: scoreBg(c.match_score), borderColor: scoreColor(c.match_score) }} title={c.ai_reasoning || ''}>
-          <span style={{ color: scoreColor(c.match_score), fontWeight: 700 }}>🤖 {Math.round(c.match_score)}%</span>
+          <span style={{ color: scoreColor(c.match_score), fontWeight: 700 }}>🤖 {Number(c.match_score).toFixed(1)}/5</span>
           {c.ai_summary && <span className="rc-ai-summary">{c.ai_summary}</span>}
         </div>
       ) : (
@@ -291,13 +291,13 @@ function AICVModal({ candidate, onClose, onSuccess }) {
                   <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" strokeWidth="10" />
                   <circle cx="50" cy="50" r="40" fill="none" stroke={scoreColor(scoreNum)} strokeWidth="10"
                     strokeDasharray={`${2 * Math.PI * 40}`}
-                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - scoreNum / 100)}`}
+                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - scoreNum / 5)}`}
                     strokeLinecap="round"
                     transform="rotate(-90 50 50)" />
                 </svg>
                 <div className="rc-score-text">
-                  <span className="rc-score-num" style={{ color: scoreColor(scoreNum) }}>{Math.round(scoreNum)}</span>
-                  <span className="rc-score-unit">/100</span>
+                  <span className="rc-score-num" style={{ color: scoreColor(scoreNum) }}>{Number(scoreNum).toFixed(1)}</span>
+                  <span className="rc-score-unit">/5.0</span>
                 </div>
               </div>
 

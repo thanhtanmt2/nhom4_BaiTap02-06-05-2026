@@ -35,3 +35,11 @@ export const rejectAdvance = (id, data) =>
 // Đánh dấu đã chi tiền
 export const disburseAdvance = (id) =>
   axiosClient.post(`/advances/${id}/disburse`);
+
+// Nhân viên tự tạo đơn
+export const requestAdvance = (data) =>
+  axiosClient.post('/advances/request', data);
+
+// Nhân viên xem danh sách đơn của mình
+export const getMyAdvances = () =>
+  axiosClient.get('/advances/my-requests');

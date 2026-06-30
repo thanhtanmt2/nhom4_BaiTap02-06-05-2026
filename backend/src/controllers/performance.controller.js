@@ -232,18 +232,40 @@ exports.updatePromotionStatus = async (req, res) => {
 
 exports.getAllEmployees = async (req, res) => {
   try {
+    const { Department, PerformanceReview } = require('../entities');
     const employees = await User.findAll({
       where: { role: 'employee' },
       attributes: ['id', 'name', 'email', 'status'],
-      include: [{
-        model: Contract,
-        as: 'contracts',
-        where: { status: 'active' },
-        required: false,
-        attributes: ['basic_salary']
-      }]
+      include: [
+        {
+          model: Department,
+          as: 'department',
+          attributes: ['id', 'name']
+        },
+        {
+          model: Contract,
+          as: 'contracts',
+          where: { status: 'active' },
+          required: false,
+          attributes: ['basic_salary']
+        }
+      ]
     });
-    res.json({ success: true, data: employees });
+
+    const formattedEmployees = await Promise.all(employees.map(async (emp) => {
+      const e = emp.toJSON();
+      const latestReview = await PerformanceReview.findOne({
+        where: { user_id: e.id },
+        order: [['year', 'DESC'], ['month', 'DESC']]
+      });
+      if (latestReview) {
+        e.latest_rating = latestReview.rating;
+        e.latest_kpi_score = latestReview.kpi_score;
+      }
+      return e;
+    }));
+
+    res.json({ success: true, data: formattedEmployees });
   } catch (error) {
     console.error('getAllEmployees error:', error);
     res.status(500).json({ success: false, message: 'Server Error' });

@@ -6,6 +6,10 @@ const { authenticateToken, authorizeRoles } = require('../middlewares/auth');
 // Tất cả route cần đăng nhập
 router.use(authenticateToken);
 
+// ── Thêm chức năng cho nhân viên tự thao tác (không cần quyền kế toán) ──
+router.post('/request', advanceController.requestAdvance);
+router.get('/my-requests', advanceController.getMyRequests);
+
 const authorizeAccountant = authorizeRoles(['admin', 'accountant']);
 
 // ── Stats (phải khai báo trước /:id để không bị nhầm route)

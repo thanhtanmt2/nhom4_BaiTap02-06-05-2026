@@ -52,14 +52,24 @@ exports.calculatePayroll = async (req, res) => {
         continue;
       }
 
-      // Truy vấn các khoản thu nhập / khấu trừ phát sinh đã áp dụng (applied) trong tháng
+      // Lấy TẤT CẢ khoản thu nhập/khấu trừ của tháng này (cả pending lẫn applied)
+      // Các khoản pending sẽ được tự động đánh dấu applied khi tính lương
       const adjustments = await SalaryAdjustment.findAll({
         where: {
           user_id: user.id,
           apply_month: month,
-          status: 'applied'
+          status: { [Op.in]: ['pending', 'applied'] }
         }
       });
+
+      // Auto-apply các khoản đang pending → applied
+      const pendingIds = adjustments.filter(a => a.status === 'pending').map(a => a.id);
+      if (pendingIds.length > 0) {
+        await SalaryAdjustment.update(
+          { status: 'applied', updated_at: new Date() },
+          { where: { id: { [Op.in]: pendingIds } } }
+        );
+      }
 
       let allowance = 0;
       let bonus = 0;
@@ -67,7 +77,9 @@ exports.calculatePayroll = async (req, res) => {
 
       adjustments.forEach(adj => {
         if (adj.kind === 'income') {
-          if (adj.category?.toLowerCase().includes('phụ cấp')) {
+          // Phụ cấp: category chứa 'phụ cấp' hoặc 'allowance'
+          const cat = (adj.category || '').toLowerCase();
+          if (cat.includes('phụ cấp') || cat.includes('allowance')) {
             allowance += Number(adj.amount) || 0;
           } else {
             bonus += Number(adj.amount) || 0;
@@ -260,5 +272,28 @@ exports.approvePayroll = async (req, res) => {
   } catch (error) {
     console.error('Lỗi khi duyệt lương:', error);
     res.status(500).json({ success: false, message: 'Lỗi server khi duyệt lương' });
+  }
+};
+
+exports.payPayroll = async (req, res) => {
+  try {
+    const { month } = req.body;
+    if (!month) {
+      return res.status(400).json({ success: false, message: 'Thiếu tham số tháng (month)' });
+    }
+
+    const [updatedRows] = await Payroll.update(
+      { status: 'paid', paid_at: new Date() },
+      { where: { month, status: 'approved' } }
+    );
+
+    if (updatedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Không có phiếu lương đã duyệt nào để thanh toán trong tháng này' });
+    }
+
+    res.status(200).json({ success: true, message: `Đã thanh toán thành công ${updatedRows} phiếu lương cho tháng ${month}` });
+  } catch (error) {
+    console.error('Lỗi khi thanh toán lương:', error);
+    res.status(500).json({ success: false, message: 'Lỗi server khi thanh toán lương' });
   }
 };
