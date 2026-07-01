@@ -61,4 +61,20 @@ export const adminService = {
     const response = await axiosClient.put(`/admin/departments/${id}/status`, { status });
     return response.data;
   },
+
+  // ---- Account Requests APIs ----
+  getPendingAccountRequests: async () => {
+    const response = await axiosClient.get('/admin/account-requests/pending');
+    return response.data;
+  },
+
+  approveAccountRequest: async (id) => {
+    const response = await axiosClient.put(`/admin/account-requests/${id}/approve`);
+    return response.data;
+  },
+
+  rejectAccountRequest: async (id) => {
+    const response = await axiosClient.put(`/admin/account-requests/${id}/reject`);
+    return response.data;
+  },
 };

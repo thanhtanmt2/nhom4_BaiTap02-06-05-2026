@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, Save } from 'lucide-react';
+import { AlertCircle, Save, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import performanceService from '../../services/performance.service';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
@@ -28,11 +28,11 @@ const EmployeeEvaluation = () => {
   const [filterTab, setFilterTab] = useState('Tất cả');
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => { fetchEmployees(); }, []);
+  useEffect(() => { fetchEmployees(); }, [formData.month, formData.year]);
 
   const fetchEmployees = async () => {
     try {
-      const res = await performanceService.getAllEmployees();
+      const res = await performanceService.getAllEmployees({ month: formData.month, year: formData.year });
       if (res.data?.employees) setEmployees(res.data.employees);
       else if (res.data?.success && Array.isArray(res.data.data)) setEmployees(res.data.data);
       else if (Array.isArray(res.data)) setEmployees(res.data);
@@ -58,6 +58,16 @@ const EmployeeEvaluation = () => {
     }
 
     setFormData(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleMonthChange = (delta) => {
+    setFormData(prev => {
+      let m = prev.month + delta;
+      let y = prev.year;
+      if (m > 12) { m = 1; y += 1; }
+      else if (m < 1) { m = 12; y -= 1; }
+      return { ...prev, month: m, year: y };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -121,22 +131,29 @@ const EmployeeEvaluation = () => {
             Tháng {formData.month}/{formData.year} · Nhận xét và chốt điểm nhân viên
           </p>
         </div>
-        <div className="flex gap-2 shrink-0">
-          <input
-            type="number"
-            name="month"
-            min={1} max={12}
-            value={formData.month}
-            onChange={handleChange}
-            className="h-9 w-16 px-2 text-[13px] text-center border border-gray-300 rounded-md focus:outline-none focus:border-navy-700 transition-colors"
-          />
-          <input
-            type="number"
-            name="year"
-            value={formData.year}
-            onChange={handleChange}
-            className="h-9 w-20 px-2 text-[13px] text-center border border-gray-300 rounded-md focus:outline-none focus:border-navy-700 transition-colors"
-          />
+        <div className="flex items-center bg-white border border-gray-200 rounded-lg p-1 shadow-sm shrink-0">
+          <button 
+            type="button"
+            onClick={() => handleMonthChange(-1)}
+            className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          
+          <div className="flex items-center justify-center gap-1.5 px-3 min-w-[110px]">
+            <Calendar size={14} className="text-gray-400" />
+            <span className="text-[13px] font-semibold text-gray-700 tracking-wide">
+              Tháng {formData.month}/{formData.year}
+            </span>
+          </div>
+
+          <button 
+            type="button"
+            onClick={() => handleMonthChange(1)}
+            className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+          >
+            <ChevronRight size={16} />
+          </button>
         </div>
       </div>
 

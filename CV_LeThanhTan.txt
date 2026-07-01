@@ -1,0 +1,54 @@
+SƠ YẾU LÝ LỊCH (CURRICULUM VITAE)
+
+Họ và tên: Lê Thanh Tân
+Ngày sinh: 22/10/2001
+Số điện thoại: 0912.345.678
+Email: lethangtan.backend@example.com
+Địa chỉ: Quận Thủ Đức, TP. Hồ Chí Minh
+Vị trí ứng tuyển: Lập trình viên Backend (Backend Developer)
+
+---
+1. MỤC TIÊU NGHỀ NGHIỆP
+Trở thành một Backend Developer chuyên nghiệp, chuyên sâu về việc thiết kế kiến trúc hệ thống (System Architecture) và xử lý dữ liệu lớn (Big Data). Mong muốn đóng góp kỹ năng xây dựng API hiệu suất cao và bảo mật vào sự phát triển của công ty, đồng thời học hỏi thêm về DevOps và Cloud Computing.
+
+---
+2. HỌC VẤN
+Đại học Khoa học Tự nhiên - ĐHQG TP.HCM
+Chuyên ngành: Khoa học máy tính (Computer Science)
+Thời gian: 09/2019 - 07/2023
+Điểm trung bình (GPA): 3.5/4.0
+Đồ án tốt nghiệp: Xây dựng hệ thống Microservices cho nền tảng thương mại điện tử.
+
+---
+3. KỸ NĂNG CHUYÊN MÔN
+- Ngôn ngữ lập trình: JavaScript/TypeScript, Python, Java.
+- Backend Frameworks: Node.js (Express, NestJS), Django, Spring Boot.
+- Cơ sở dữ liệu (Database): MySQL, PostgreSQL, MongoDB, Redis.
+- Kiến trúc & Công cụ: RESTful API, GraphQL, Microservices, RabbitMQ, Kafka.
+- DevOps & Triển khai: Docker, Kubernetes, CI/CD (GitHub Actions), AWS cơ bản (EC2, S3).
+- Bảo mật: OAuth2, JWT, hiểu biết về các lỗ hổng OWASP Top 10.
+
+---
+4. KINH NGHIỆM LÀM VIỆC
+
+Công ty Phần Mềm XYZ (08/2023 - Hiện tại)
+Vị trí: Backend Developer (Junior)
+- Tham gia phát triển hệ thống ERP cho doanh nghiệp vận tải.
+- Thiết kế và tối ưu hóa hàng trăm RESTful API bằng NestJS và PostgreSQL.
+- Tích hợp hệ thống caching bằng Redis, giúp giảm 40% thời gian phản hồi (response time) của các API báo cáo.
+- Viết Unit Test và Integration Test đảm bảo độ bao phủ mã (code coverage) trên 80%.
+
+Dự án Cửa hàng Sách Online (02/2023 - 06/2023)
+Vị trí: Backend Developer (Đồ án môn học)
+- Xây dựng API quản lý người dùng, giỏ hàng, và lịch sử đơn hàng bằng Node.js.
+- Cấu hình Nginx làm Reverse Proxy và Load Balancer.
+
+---
+5. CHỨNG CHỈ
+- AWS Certified Cloud Practitioner.
+- Lập trình CSDL SQL Nâng cao (HackerRank).
+
+---
+6. SỞ THÍCH
+- Tham gia các diễn đàn công nghệ và mã nguồn mở (Open Source).
+- Đạp xe, nghe nhạc.

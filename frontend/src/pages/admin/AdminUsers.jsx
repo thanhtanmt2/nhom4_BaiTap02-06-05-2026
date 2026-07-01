@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { Search, Plus, RefreshCw, ChevronLeft, ChevronRight, CheckCircle, X, Camera, UserCheck } from 'lucide-react';
 import * as faceapi from 'face-api.js';
 import { adminService } from '../../services/admin.service';
@@ -27,6 +27,8 @@ const ROLE_BADGE = {
 
 const AdminUsers = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -37,7 +39,7 @@ const AdminUsers = () => {
   });
   const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
 
-  const EMPTY_CREATE_FORM = { name: '', email: '', role: 'employee', department_id: '' };
+  const EMPTY_CREATE_FORM = { name: '', email: '', role: 'employee', department_id: '', account_request_id: null };
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState(EMPTY_CREATE_FORM);
   const [creating, setCreating] = useState(false);
@@ -83,6 +85,22 @@ const AdminUsers = () => {
       if (res.success) setDepartments(res.data);
     }).catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (location.state?.prefillRequest) {
+      const req = location.state.prefillRequest;
+      setCreateForm({
+        name: req.full_name || '',
+        email: req.email || '',
+        role: req.role || 'employee',
+        department_id: req.department_id || '',
+        account_request_id: req.id
+      });
+      setShowCreateModal(true);
+      // Clear the state so it doesn't reopen on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;

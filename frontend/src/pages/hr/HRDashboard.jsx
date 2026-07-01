@@ -30,6 +30,8 @@ const HRDashboard = () => {
   const [activeEventTab, setActiveEventTab] = useState('anniversary');
   const [dashboardEvents, setDashboardEvents] = useState([]);
   const [dashboardInterviews, setDashboardInterviews] = useState([]);
+  const [stats, setStats] = useState({ totalEmployees: 0, newEmployeesThisMonth: 0, expiringContracts: 0, totalPipeline: 0 });
+  const [pipelineData, setPipelineData] = useState([0, 0, 0, 0, 0]);
 
   const fetchData = async () => {
     try {
@@ -43,6 +45,8 @@ const HRDashboard = () => {
       if (dashRes.data.success) {
         setDashboardEvents(dashRes.data.data.events || []);
         setDashboardInterviews(dashRes.data.data.interviews || []);
+        if (dashRes.data.data.stats) setStats(dashRes.data.data.stats);
+        if (dashRes.data.data.pipelineData) setPipelineData(dashRes.data.data.pipelineData);
       }
     } catch { /* silent */ }
     finally { setLoading(false); }
@@ -70,7 +74,6 @@ const HRDashboard = () => {
   };
 
   const pending = requests.filter((r) => r.status === 'pending');
-  const pipelineData = [0, 0, 0, 0, 0];
   const maxPipeline = Math.max(...pipelineData, 1);
 
   return (
@@ -98,17 +101,17 @@ const HRDashboard = () => {
 
       {/* Callout nếu có HĐ sắp hết hạn */}
       {pending.length > 0 && (
-        <Callout variant="warning" action="Xem ngay →" onAction={() => navigate('/hr/contracts')}>
+        <Callout variant="warning">
           <strong>{pending.length} yêu cầu tạo tài khoản</strong> đang chờ Admin phê duyệt.
         </Callout>
       )}
 
       {/* KPI cards */}
       <div className="grid grid-cols-4 gap-4">
-        <StatCard label="Tổng nhân viên" value="247" trend="+8" trendUp trendLabel="tháng này" />
-        <StatCard label="Tuyển mới tháng" value="8" trend="+60%" trendUp trendLabel="vs. tháng trước" accentValue />
-        <StatCard label="HĐ sắp hết hạn (60 ngày)" value="12" />
-        <StatCard label="Ứng viên trong pipeline" value="23" trendLabel="5 vị trí đang mở · 3 offer chờ" />
+        <StatCard label="Tổng nhân viên" value={stats.totalEmployees.toString()} trend={`+${stats.newEmployeesThisMonth}`} trendUp trendLabel="tháng này" />
+        <StatCard label="Tuyển mới tháng" value={stats.newEmployeesThisMonth.toString()} trend="+0%" trendUp trendLabel="vs. tháng trước" accentValue />
+        <StatCard label="HĐ sắp hết hạn (60 ngày)" value={stats.expiringContracts.toString()} />
+        <StatCard label="Ứng viên trong pipeline" value={stats.totalPipeline.toString()} trendLabel="Tất cả vị trí đang mở" />
       </div>
 
       {/* 2 col: pipeline + events */}

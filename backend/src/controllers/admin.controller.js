@@ -252,7 +252,7 @@ const updateUserDepartment = async (req, res) => {
 // ============================================================
 const createUser = async (req, res) => {
   try {
-    const { name, email, role, department_id } = req.body;
+    const { name, email, role, department_id, basic_salary, account_request_id } = req.body;
 
     // Validate bắt buộc
     if (!email || !role) {
@@ -306,6 +306,14 @@ const createUser = async (req, res) => {
 
     // TODO: Gửi email thông báo đến nhân viên kèm mật khẩu tạm
     // await sendWelcomeEmail(email, tempPassword);
+
+    if (account_request_id) {
+      const { AccountRequest } = require('../entities');
+      await AccountRequest.update(
+        { status: 'approved' },
+        { where: { id: account_request_id } }
+      );
+    }
 
     return res.status(201).json({
       success: true,

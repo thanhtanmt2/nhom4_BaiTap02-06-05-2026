@@ -174,19 +174,35 @@ const deleteCandidate = async (req, res) => {
 
 // ── POST /api/recruitment/candidates/:id/analyze-cv ───────────────
 const analyzeCV = async (req, res) => {
-  let filePath = null;
+  let tempFilePath = null;
   try {
     const candidate = await Candidate.findByPk(req.params.id);
     if (!candidate) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy ứng viên' });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'Vui lòng upload file CV (PDF/DOCX)' });
+    let filePath = null;
+    let ext = '';
+    let cvRelativePath = candidate.cv_file_path || null;
+
+    if (req.file) {
+      // Có file mới upload lên
+      tempFilePath = req.file.path;
+      filePath = req.file.path;
+      ext = path.extname(req.file.originalname).toLowerCase();
+      cvRelativePath = `/uploads/cv/${req.file.filename}`;
+    } else if (candidate.cv_file_path) {
+      // Dùng file CV đã có sẵn từ lần nộp đơn trước
+      const existingPath = path.join(__dirname, '../../', candidate.cv_file_path);
+      if (!fs.existsSync(existingPath)) {
+        return res.status(400).json({ success: false, message: 'File CV cũ không còn tồn tại trên server. Vui lòng upload file mới.' });
+      }
+      filePath = existingPath;
+      ext = path.extname(candidate.cv_file_path).toLowerCase();
+    } else {
+      return res.status(400).json({ success: false, message: 'Ứng viên chưa có CV. Vui lòng upload file CV (PDF/DOCX).' });
     }
 
-    filePath = req.file.path;
-    const ext = path.extname(req.file.originalname).toLowerCase();
     let cvText = '';
 
     // Trích xuất text từ file
@@ -210,7 +226,6 @@ const analyzeCV = async (req, res) => {
     const aiResult = await analyzeWithGemini(cvText, candidate.position, currentSkills);
 
     // Cập nhật vào database
-    const cvRelativePath = `/uploads/cv/${req.file.filename}`;
     await candidate.update({
       match_score: aiResult.match_score,
       ai_summary: aiResult.summary,

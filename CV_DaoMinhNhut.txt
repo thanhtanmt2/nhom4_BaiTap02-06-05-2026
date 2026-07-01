@@ -1,0 +1,52 @@
+SƠ YẾU LÝ LỊCH (CURRICULUM VITAE)
+
+Họ và tên: Đào Minh Nhựt
+Ngày sinh: 15/08/2002
+Số điện thoại: 0901.234.567
+Email: daominhnhut.dev@example.com
+Địa chỉ: Quận 1, TP. Hồ Chí Minh
+Vị trí ứng tuyển: Lập trình viên Fullstack (Fullstack Web Developer)
+
+---
+1. MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn được làm việc trong môi trường công nghệ năng động, áp dụng những kiến thức về ReactJS và Node.js để xây dựng các sản phẩm phần mềm chất lượng. Mục tiêu trong 3 năm tới trở thành Senior Fullstack Developer và có thể dẫn dắt một nhóm nhỏ (Team Lead).
+
+---
+2. HỌC VẤN
+Đại học Công Nghệ TP.HCM (HUTECH)
+Chuyên ngành: Kỹ thuật phần mềm (Software Engineering)
+Thời gian: 09/2020 - 07/2024
+Điểm trung bình (GPA): 3.2/4.0
+
+---
+3. KỸ NĂNG CHUYÊN MÔN
+- Frontend: HTML5, CSS3, JavaScript (ES6+), ReactJS, Tailwind CSS.
+- Backend: Node.js, Express.js, RESTful API.
+- Cơ sở dữ liệu: MySQL, MongoDB, PostgreSQL.
+- Công cụ: Git, GitHub, Docker, Postman, VS Code.
+- Kỹ năng mềm: Làm việc nhóm, quản lý thời gian, khả năng tự học công nghệ mới nhanh chóng.
+
+---
+4. KINH NGHIỆM LÀM VIỆC
+
+Công ty TNHH Công Nghệ ABC (06/2024 - Hiện tại)
+Vị trí: Thực tập sinh Web Developer (Fullstack Intern)
+- Tham gia phát triển hệ thống quản trị nhân sự (HRM) nội bộ.
+- Thiết kế và lập trình giao diện Dashboard sử dụng ReactJS và Tailwind CSS.
+- Xây dựng các API RESTful bằng Node.js và Express.js để quản lý hồ sơ nhân viên và hợp đồng.
+- Phối hợp với team QA để tìm và sửa lỗi (fix bugs), tối ưu hóa hiệu năng truy vấn Database.
+
+Dự án Freelance: Website Bán Hàng Trực Tuyến (01/2024 - 04/2024)
+Vị trí: Lập trình viên Frontend
+- Xây dựng giao diện trang chủ, giỏ hàng và thanh toán bằng React.
+- Tích hợp API thanh toán VNPay.
+
+---
+5. CHỨNG CHỈ & NGOẠI NGỮ
+- Tiếng Anh: TOEIC 650 (Giao tiếp cơ bản, đọc hiểu tài liệu chuyên ngành tốt).
+- Chứng chỉ "Lập trình Node.js nâng cao" trên Coursera (Hoàn thành năm 2023).
+
+---
+6. SỞ THÍCH
+- Đọc sách về công nghệ và kiến trúc phần mềm.
+- Chơi thể thao (Bóng đá, Cầu lông) để rèn luyện sức khỏe sau giờ làm việc.

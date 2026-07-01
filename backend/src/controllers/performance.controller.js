@@ -232,6 +232,7 @@ exports.updatePromotionStatus = async (req, res) => {
 
 exports.getAllEmployees = async (req, res) => {
   try {
+    const { month, year } = req.query;
     const { Department, PerformanceReview } = require('../entities');
     const employees = await User.findAll({
       where: { role: 'employee' },
@@ -254,8 +255,15 @@ exports.getAllEmployees = async (req, res) => {
 
     const formattedEmployees = await Promise.all(employees.map(async (emp) => {
       const e = emp.toJSON();
+      
+      const reviewWhere = { user_id: e.id };
+      if (month && year) {
+        reviewWhere.month = parseInt(month);
+        reviewWhere.year = parseInt(year);
+      }
+
       const latestReview = await PerformanceReview.findOne({
-        where: { user_id: e.id },
+        where: reviewWhere,
         order: [['year', 'DESC'], ['month', 'DESC']]
       });
       if (latestReview) {

@@ -36,7 +36,10 @@ const sendOTPEmail = async (toEmail, userName, otpCode) => {
       </div>
     `,
   };
-  await transporter.sendMail(mailOptions);
+  const info = await transporter.sendMail(mailOptions);
+  if (info.messageId) {
+    console.log('OTP Email Preview URL: ' + nodemailer.getTestMessageUrl(info));
+  }
 };
 
 const sendPasswordResetEmail = async (toEmail, otpCode) => {
@@ -74,7 +77,10 @@ const sendPasswordResetEmail = async (toEmail, otpCode) => {
       </div>
     `,
   };
-  await transporter.sendMail(mailOptions);
+  const info = await transporter.sendMail(mailOptions);
+  if (info.messageId) {
+    console.log('Password Reset Email Preview URL: ' + nodemailer.getTestMessageUrl(info));
+  }
 };
 
 const sendPayslipEmail = async (toEmail, userName, payroll) => {
@@ -128,7 +134,10 @@ const sendPayslipEmail = async (toEmail, userName, payroll) => {
       </div>
     `,
   };
-  await transporter.sendMail(mailOptions);
+  const info = await transporter.sendMail(mailOptions);
+  if (info.messageId) {
+    console.log('Payslip Email Preview URL: ' + nodemailer.getTestMessageUrl(info));
+  }
 };
 
 const sendApplicationConfirmEmail = async (toEmail, candidateName, jobTitle) => {
@@ -168,7 +177,10 @@ const sendApplicationConfirmEmail = async (toEmail, candidateName, jobTitle) => 
       </div>
     `,
   };
-  await transporter.sendMail(mailOptions);
+  const info = await transporter.sendMail(mailOptions);
+  if (info.messageId) {
+    console.log('Application Confirm Email Preview URL: ' + nodemailer.getTestMessageUrl(info));
+  }
 };
 
 module.exports = { sendOTPEmail, sendPasswordResetEmail, sendPayslipEmail, sendApplicationConfirmEmail };

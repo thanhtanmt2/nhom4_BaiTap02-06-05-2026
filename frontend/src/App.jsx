@@ -35,10 +35,10 @@ import UserTasks from './pages/user/UserTasks';
 import EmployeeEvaluation from './pages/hr/EmployeeEvaluation';
 import PromotionManager from './pages/hr/PromotionManager';
 import HRAttendanceReport from './pages/hr/HRAttendanceReport';
+import HRAccountRequests from './pages/hr/HRAccountRequests';
 import ManagerDashboard from './pages/manager/ManagerDashboard';
 import AccountantDashboard from './pages/accountant/AccountantDashboard';
 import PayrollPage from './pages/accountant/PayrollPage';
-import TaxConfig from './pages/accountant/TaxConfig';
 import AccountantPayroll from './pages/accountant/AccountantPayroll';
 import AdjustmentsPage from './pages/accountant/AdjustmentsPage';
 import AdvancesPage from './pages/accountant/AdvancesPage';
@@ -52,6 +52,7 @@ import HRInterviews from './pages/hr/HRInterviews';
 import JobListPage from './pages/public/JobListPage';
 import JobDetailApplyPage from './pages/public/JobDetailApplyPage';
 import JobPostingManager from './pages/hr/JobPostingManager';
+import HomePage from './pages/public/HomePage';
 
 // Redirect /profile đến đúng dashboard theo role
 const RoleRedirect = () => {
@@ -84,7 +85,6 @@ const App = () => {
   return (
     <Routes>
       {/* Public routes (auth) */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
@@ -93,12 +93,9 @@ const App = () => {
       {/* Legacy redirect */}
       <Route path="/profile" element={<RoleRedirect />} />
 
-      {/* Public routes với Navbar & Footer */}
-      <Route element={<Layout />}>
-      </Route>
-
-      {/* Cổng tuyển dụng công khai — không cần đăng nhập */}
+      {/* Trang chủ công ty & Cổng tuyển dụng công khai — không cần đăng nhập */}
       <Route element={<PublicLayout />}>
+        <Route path="/" element={<HomePage />} />
         <Route path="/jobs" element={<JobListPage />} />
         <Route path="/jobs/:id/apply" element={<JobDetailApplyPage />} />
       </Route>
@@ -155,7 +152,6 @@ const App = () => {
         <Route path="dashboard"     element={<AccountantDashboard />} />
         <Route path="payroll"       element={<PayrollPage />} />
         <Route path="payroll-send"  element={<AccountantPayroll />} />
-        <Route path="tax-config"    element={<TaxConfig />} />
         <Route path="adjustments"   element={<AdjustmentsPage />} />
         <Route path="advances"      element={<AdvancesPage />} />
       </Route>
@@ -180,6 +176,7 @@ const App = () => {
         <Route path="interviews"     element={<HRInterviews />} />
         <Route path="reports"        element={<HRAttendanceReport />} />
         <Route path="attendance"     element={<HRAttendanceReport />} />
+        <Route path="account-requests" element={<HRAccountRequests />} />
       </Route>
 
       {/* Admin dashboard */}

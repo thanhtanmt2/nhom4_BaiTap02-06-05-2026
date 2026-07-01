@@ -30,6 +30,15 @@ const hrService = {
   // [DELETE] Xóa hợp đồng
   deleteContract: (contractId) => {
     return axiosClient.delete(`/hr/contracts/${contractId}`);
+  },
+
+  // ---- Yêu cầu cấp tài khoản ----
+  createAccountRequest: (data) => {
+    return axiosClient.post('/hr/account-requests', data);
+  },
+  
+  getMyAccountRequests: () => {
+    return axiosClient.get('/hr/account-requests/my');
   }
 };
 

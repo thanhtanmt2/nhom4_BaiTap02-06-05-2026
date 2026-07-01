@@ -14,6 +14,13 @@ exports.calculatePayroll = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Chưa có cấu hình Thuế/Bảo hiểm' });
     }
 
+    // Kiểm tra xem HR đã chốt công tháng này chưa
+    const { AttendanceLock } = require('../entities');
+    const lock = await AttendanceLock.findOne({ where: { month } });
+    if (!lock || lock.status !== 'locked') {
+      return res.status(400).json({ success: false, message: 'HR chưa chốt bảng chấm công cho tháng này. Không thể tính lương!' });
+    }
+
     // Lấy tất cả nhân viên có hợp đồng
     const users = await User.findAll({
       where: { status: 'active' },

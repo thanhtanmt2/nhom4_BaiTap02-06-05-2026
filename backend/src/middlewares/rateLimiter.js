@@ -12,6 +12,7 @@ const loginLimiter = isBypass ? bypassMiddleware : rateLimit({
     success: false,
     message: 'Số lần đăng nhập vượt quá giới hạn, vui lòng thử lại sau 15 phút',
   },
+  skipSuccessfulRequests: true, // Chỉ đếm những lần đăng nhập thất bại (chống Bruteforce)
   standardHeaders: true,
   legacyHeaders: false,
 });

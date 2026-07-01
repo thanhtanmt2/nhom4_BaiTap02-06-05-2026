@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Calculator, RefreshCw, Users, CheckCircle, CheckSquare, CreditCard, Banknote, Sparkles, X } from "lucide-react";
 import Badge from "../../components/ui/Badge";
 import Avatar from "../../components/ui/Avatar";
@@ -80,10 +80,20 @@ function PaymentModal({ visible, count, totalNet, onConfirm, onClose, paying }) 
   const [step, setStep]       = useState("idle");
   const [progress, setProgress] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  
+  const [finalCount, setFinalCount] = useState(0);
+  const [finalNet, setFinalNet] = useState(0);
 
   useEffect(() => {
     if (visible) { setStep("idle"); setProgress(0); setShowConfetti(false); }
   }, [visible]);
+
+  useEffect(() => {
+    if (visible && step === "idle") {
+      setFinalCount(count);
+      setFinalNet(totalNet);
+    }
+  }, [visible, count, totalNet, step]);
 
   const handleConfirm = async () => {
     setStep("processing");
@@ -137,15 +147,15 @@ function PaymentModal({ visible, count, totalNet, onConfirm, onClose, paying }) 
               <div style={{ borderRadius:14, background:"linear-gradient(135deg,#eef2ff,#f5f3ff)", border:"1px solid #c7d2fe", padding:18 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", marginBottom:10 }}>
                   <span style={{ fontSize:11, fontWeight:600, textTransform:"uppercase", letterSpacing:.06, color:"#6366f1" }}>Số nhân viên</span>
-                  <span style={{ fontSize:26, fontWeight:800, color:"#4338ca", fontFamily:"monospace" }}>{count}</span>
+                  <span style={{ fontSize:26, fontWeight:800, color:"#4338ca", fontFamily:"monospace" }}>{finalCount}</span>
                 </div>
                 <div style={{ display:"flex", justifyContent:"space-between" }}>
                   <span style={{ fontSize:11, fontWeight:600, textTransform:"uppercase", letterSpacing:.06, color:"#6366f1" }}>Tổng chi trả</span>
-                  <span style={{ fontSize:20, fontWeight:700, color:"#059669", fontFamily:"monospace" }}>{formatMoney(totalNet)} đ</span>
+                  <span style={{ fontSize:20, fontWeight:700, color:"#059669", fontFamily:"monospace" }}>{formatMoney(finalNet)} đ</span>
                 </div>
               </div>
               <p style={{ fontSize:13, color:"#64748b", lineHeight:1.6, margin:0 }}>
-                Thao tác này sẽ đánh dấu <strong style={{ color:"#1e293b" }}>{count} phiếu lương</strong> là&nbsp;
+                Thao tác này sẽ đánh dấu <strong style={{ color:"#1e293b" }}>{finalCount} phiếu lương</strong> là&nbsp;
                 <span style={{ color:"#059669", fontWeight:600 }}>Đã thanh toán</span>. Hành động không thể hoàn tác.
               </p>
               <div style={{ display:"flex", gap:12 }}>
@@ -201,19 +211,19 @@ function PaymentModal({ visible, count, totalNet, onConfirm, onClose, paying }) 
                 <h3 style={{ fontSize:22, fontWeight:800, color:"#0f172a", margin:0 }}>Thanh toán thành công! 🎉</h3>
                 <p style={{ fontSize:13, color:"#64748b", marginTop:6 }}>
                   Đã chi trả&nbsp;
-                  <strong style={{ color:"#059669" }}>{formatMoney(totalNet)} đ</strong>
+                  <strong style={{ color:"#059669" }}>{formatMoney(finalNet)} đ</strong>
                   &nbsp;cho&nbsp;
-                  <strong style={{ color:"#1e293b" }}>{count} nhân viên</strong>
+                  <strong style={{ color:"#1e293b" }}>{finalCount} nhân viên</strong>
                 </p>
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, width:"100%" }}>
                 <div style={{ borderRadius:12, background:"#f0fdf4", border:"1px solid #bbf7d0", padding:14, textAlign:"center" }}>
                   <p style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:.06, color:"#16a34a", margin:"0 0 4px" }}>Nhân viên</p>
-                  <p style={{ fontSize:26, fontWeight:800, color:"#15803d", fontFamily:"monospace", margin:0 }}>{count}</p>
+                  <p style={{ fontSize:26, fontWeight:800, color:"#15803d", fontFamily:"monospace", margin:0 }}>{finalCount}</p>
                 </div>
                 <div style={{ borderRadius:12, background:"#eef2ff", border:"1px solid #c7d2fe", padding:14, textAlign:"center" }}>
                   <p style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:.06, color:"#4f46e5", margin:"0 0 4px" }}>Tổng chi</p>
-                  <p style={{ fontSize:14, fontWeight:800, color:"#3730a3", fontFamily:"monospace", margin:0 }}>{formatMoney(totalNet)}đ</p>
+                  <p style={{ fontSize:14, fontWeight:800, color:"#3730a3", fontFamily:"monospace", margin:0 }}>{formatMoney(finalNet)}đ</p>
                 </div>
               </div>
               <button

@@ -16,7 +16,7 @@ const LeaveRequest = sequelize.define(
       onDelete: 'CASCADE',
     },
     type: {
-      type: DataTypes.ENUM('leave', 'ot'),
+      type: DataTypes.STRING, // Đổi từ ENUM sang STRING để bộc lộ rõ lỗ hổng của Controller
       allowNull: false,
     },
     start_date: {

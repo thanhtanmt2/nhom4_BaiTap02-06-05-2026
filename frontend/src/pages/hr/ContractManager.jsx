@@ -271,15 +271,6 @@ const ContractManager = () => {
           <option value="expired">Hết hạn</option>
           <option value="terminated">Đã chấm dứt</option>
         </select>
-        <label className="flex items-center gap-2 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={onlyExpiring}
-            onChange={e => setOnlyExpiring(e.target.checked)}
-            className="w-4 h-4 rounded accent-navy-700"
-          />
-          <span className="text-[13px] text-gray-700">Chỉ hiện sắp hết hạn</span>
-        </label>
         {(search || filterType || filterStatus || onlyExpiring) && (
           <button
             onClick={() => { setSearch(''); setFilterType(''); setFilterStatus(''); setOnlyExpiring(false); }}

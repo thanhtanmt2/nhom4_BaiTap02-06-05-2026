@@ -1,4 +1,4 @@
-const { Attendance, AttendanceLock, Profile } = require('../entities');
+const { Attendance, AttendanceLock, Profile, Contract } = require('../entities');
 const { Op } = require('sequelize');
 
 const FACE_MATCH_THRESHOLD = parseFloat(process.env.FACE_MATCH_THRESHOLD) || 0.55;
@@ -21,6 +21,12 @@ exports.checkIn = async (req, res) => {
     const today = new Date();
     const dateStr = getLocalDateStr(today);
     const currentMonth = dateStr.substring(0, 7);
+
+    // Kiểm tra nhân viên có hợp đồng active không
+    const activeContract = await Contract.findOne({ where: { user_id: userId, status: 'active' } });
+    if (!activeContract) {
+      return res.status(403).json({ success: false, message: 'Bạn chưa có hợp đồng lao động chính thức, không thể chấm công!' });
+    }
 
     // Kiểm tra tháng bị chốt
     const isLocked = await AttendanceLock.findOne({ where: { month: currentMonth } });
@@ -93,6 +99,12 @@ exports.checkOut = async (req, res) => {
     const today = new Date();
     const dateStr = getLocalDateStr(today);
     const currentMonth = dateStr.substring(0, 7); // e.g. "2026-06"
+
+    // Kiểm tra nhân viên có hợp đồng active không
+    const activeContract = await Contract.findOne({ where: { user_id: userId, status: 'active' } });
+    if (!activeContract) {
+      return res.status(403).json({ success: false, message: 'Bạn chưa có hợp đồng lao động chính thức, không thể chấm công!' });
+    }
 
     // Kiểm tra xem tháng hiện tại có bị chốt/khóa chưa
     const isLocked = await AttendanceLock.findOne({ where: { month: currentMonth } });

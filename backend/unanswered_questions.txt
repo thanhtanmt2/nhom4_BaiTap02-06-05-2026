@@ -1,1 +1,7 @@
 [15:24:45 30/6/2026] UserID: 4 - Câu hỏi: lương của lê văn bình là bao nhiêu
+[08:33:02 1/7/2026] UserID: 1 - Câu hỏi: tôi đang ở trang nào
+[08:33:18 1/7/2026] UserID: 1 - Câu hỏi: hiện tại hệ thống có bao nhiêu tài khoản
+[08:35:37 1/7/2026] UserID: 1 - Câu hỏi: hệ thống có bao nhiêu tài khoản
+[08:36:13 1/7/2026] UserID: 1 - Câu hỏi: Nhu cầu tuyển dụng của công ty hiện tại là gì?
+[08:37:05 1/7/2026] UserID: 1 - Câu hỏi: Yêu cầu nghiệp vụ của công ty là gì?
+[08:38:02 1/7/2026] UserID: 1 - Câu hỏi: có bao nhiêu tài khoản hệ thống

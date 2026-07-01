@@ -5,7 +5,7 @@ import { Mail, Lock, Eye, EyeOff, Building2, CheckCircle } from 'lucide-react';
 import { loginThunk } from '../redux/authSlice';
 
 const FEATURES = [
-  'Chấm công bằng GPS, lịch sử minh bạch',
+  'Chấm công bằng AI nhận diện khuôn mặt, lịch sử minh bạch',
   'Tính lương tự động cho Full-time / Intern / Freelancer',
   'Bảo mật 2FA, audit log toàn hệ thống',
 ];

@@ -197,11 +197,13 @@ function CandidateCard({ candidate: c, dragging, selected, onSelect, onDragStart
 
 /* ── AI CV Modal ─────────────────────────────────────────── */
 function AICVModal({ candidate, onClose, onSuccess }) {
+  const hasExistingCV = !!candidate.cv_file_path;
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [dragOver, setDragOver] = useState(false);
+  const [useExisting, setUseExisting] = useState(hasExistingCV); // dùng file cũ hay upload mới
   const inputRef = useRef(null);
 
   const handleFile = (f) => {
@@ -213,7 +215,7 @@ function AICVModal({ candidate, onClose, onSuccess }) {
     if (f.size > 5 * 1024 * 1024) {
       setError('File quá lớn (tối đa 5MB)'); return;
     }
-    setFile(f); setError('');
+    setFile(f); setError(''); setUseExisting(false);
   };
 
   const handleDrop = (e) => {
@@ -222,6 +224,22 @@ function AICVModal({ candidate, onClose, onSuccess }) {
   };
 
   const submit = async () => {
+    // Nếu dùng file cũ → gửi không kèm file (backend tự đọc)
+    if (useExisting && hasExistingCV) {
+      setLoading(true); setError('');
+      try {
+        const res = await recruitmentService.analyzeCV(candidate.id, null);
+        setResult(res.data);
+        onSuccess();
+      } catch (e) {
+        setError(e.response?.data?.message || 'Lỗi khi phân tích CV');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Upload file mới
     if (!file) { setError('Vui lòng chọn file CV'); return; }
     setLoading(true); setError('');
     try {
@@ -236,6 +254,7 @@ function AICVModal({ candidate, onClose, onSuccess }) {
   };
 
   const scoreNum = result?.match_score ?? 0;
+  const existingFileName = candidate.cv_file_path ? candidate.cv_file_path.split('/').pop() : '';
 
   return (
     <div className="rc-modal-bg" onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -253,30 +272,60 @@ function AICVModal({ candidate, onClose, onSuccess }) {
 
           {!result ? (
             <>
-              {/* Drop zone */}
-              <div
-                className={`rc-dropzone${dragOver ? ' rc-dropzone--over' : ''}${file ? ' rc-dropzone--has-file' : ''}`}
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={handleDrop}
-                onClick={() => inputRef.current?.click()}
-              >
-                <input ref={inputRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
-                  onChange={(e) => handleFile(e.target.files[0])} />
-                {file ? (
-                  <>
-                    <div className="rc-dropzone__icon">📄</div>
-                    <p className="rc-dropzone__name">{file.name}</p>
-                    <p className="rc-dropzone__size">{(file.size / 1024).toFixed(0)} KB</p>
-                  </>
-                ) : (
-                  <>
-                    <div className="rc-dropzone__icon">📂</div>
-                    <p className="rc-dropzone__text">Kéo thả file CV vào đây</p>
-                    <p className="rc-dropzone__hint">hoặc click để chọn file · PDF, DOC, DOCX · tối đa 5MB</p>
-                  </>
-                )}
-              </div>
+              {/* Nếu đã có CV từ lần nộp đơn → hiển thị thông tin và cho phân tích ngay */}
+              {hasExistingCV && useExisting ? (
+                <div style={{ border: '2px solid #6366f1', borderRadius: 12, padding: '20px 24px', background: '#f5f3ff', textAlign: 'center' }}>
+                  <div style={{ fontSize: 36, marginBottom: 8 }}>📄</div>
+                  <p style={{ fontWeight: 700, color: '#4f46e5', fontSize: 14, marginBottom: 4 }}>
+                    CV đã nộp kèm hồ sơ
+                  </p>
+                  <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>{existingFileName}</p>
+                  <p style={{ fontSize: 12, color: '#6b7280' }}>
+                    File này đã được lưu trên hệ thống. AI sẽ đọc và phân tích ngay mà không cần upload lại.
+                  </p>
+                  <button
+                    onClick={() => setUseExisting(false)}
+                    style={{ marginTop: 12, fontSize: 12, color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    Hoặc upload file CV mới thay thế
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Drop zone - chỉ hiện khi không có CV cũ hoặc muốn đổi */}
+                  <div
+                    className={`rc-dropzone${dragOver ? ' rc-dropzone--over' : ''}${file ? ' rc-dropzone--has-file' : ''}`}
+                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={handleDrop}
+                    onClick={() => inputRef.current?.click()}
+                  >
+                    <input ref={inputRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
+                      onChange={(e) => handleFile(e.target.files[0])} />
+                    {file ? (
+                      <>
+                        <div className="rc-dropzone__icon">📄</div>
+                        <p className="rc-dropzone__name">{file.name}</p>
+                        <p className="rc-dropzone__size">{(file.size / 1024).toFixed(0)} KB</p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="rc-dropzone__icon">📂</div>
+                        <p className="rc-dropzone__text">Kéo thả file CV vào đây</p>
+                        <p className="rc-dropzone__hint">hoặc click để chọn file · PDF, DOC, DOCX · tối đa 5MB</p>
+                      </>
+                    )}
+                  </div>
+                  {hasExistingCV && (
+                    <button
+                      onClick={() => { setFile(null); setUseExisting(true); }}
+                      style={{ marginTop: 8, fontSize: 12, color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', display: 'block' }}
+                    >
+                      ← Dùng lại CV đã nộp trước đó
+                    </button>
+                  )}
+                </>
+              )}
 
               <div className="rc-ai-info">
                 <span>✨</span>
@@ -328,7 +377,7 @@ function AICVModal({ candidate, onClose, onSuccess }) {
             {result ? 'Đóng' : 'Huỷ'}
           </button>
           {!result && (
-            <button className="rc-btn rc-btn--primary" onClick={submit} disabled={loading || !file}
+            <button className="rc-btn rc-btn--primary" onClick={submit} disabled={loading || (!useExisting && !file)}
               style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>
               {loading ? (
                 <><span className="rc-btn-spinner" /> Đang phân tích...</>

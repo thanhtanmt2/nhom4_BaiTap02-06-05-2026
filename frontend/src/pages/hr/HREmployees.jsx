@@ -26,7 +26,7 @@ const HREmployees = () => {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [filterStatus, setFilterStatus] = useState('active');
 
   useEffect(() => { fetchEmployees(); }, []);
 

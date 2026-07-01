@@ -21,8 +21,8 @@ const updatePromotionStatus = (id, status) => {
   return axiosClient.patch(`/performance/promotions/${id}/status`, { status });
 };
 
-const getAllEmployees = () => {
-  return axiosClient.get(`/performance/employees`);
+const getAllEmployees = (params = {}) => {
+  return axiosClient.get(`/performance/employees`, { params });
 };
 
 export default {

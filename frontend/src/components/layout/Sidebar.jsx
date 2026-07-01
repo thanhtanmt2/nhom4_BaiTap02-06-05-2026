@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   LayoutDashboard, Users, Building2, ClipboardList, UserSearch, Settings,
   UserCircle, FileText, CheckSquare, BarChart2, CalendarDays, LogOut,
-  Home, Clock, Wallet, Star, TrendingUp, PlusCircle, List, Banknote
+  Home, Clock, Wallet, Star, TrendingUp, PlusCircle, List, Banknote, UserPlus
 } from 'lucide-react';
 import { logout } from '../../redux/authSlice';
 import Avatar from '../ui/Avatar';
@@ -48,6 +48,7 @@ const NAV_CONFIG = {
         title: 'Nhân sự',
         items: [
           { label: 'Hồ sơ nhân viên',    path: '/hr/employees',       icon: Users },
+          { label: 'Yêu cầu cấp TK',     path: '/hr/account-requests', icon: UserPlus },
           { label: 'Hợp đồng lao động',  path: '/hr/contracts',       icon: FileText },
           { label: 'Đề xuất thăng tiến', path: '/hr/promotions',      icon: TrendingUp },
         ],
@@ -55,8 +56,14 @@ const NAV_CONFIG = {
       {
         title: 'Tuyển dụng',
         items: [
+          { label: 'Tin tuyển dụng',     path: '/hr/job-postings',    icon: ClipboardList },
           { label: 'Ứng viên',           path: '/hr/recruitment',     icon: UserSearch },
           { label: 'Lịch phỏng vấn',     path: '/hr/interviews',      icon: CalendarDays },
+        ],
+      },
+      {
+        title: 'Báo cáo',
+        items: [
           { label: 'Báo cáo chấm công',  path: '/hr/reports',         icon: BarChart2 },
         ],
       },
@@ -122,7 +129,6 @@ const NAV_CONFIG = {
           { label: 'Gửi phiếu lương',   path: '/accountant/payroll-send', icon: FileText },
           { label: 'Khoản thu nhập',    path: '/accountant/adjustments',  icon: PlusCircle },
           { label: 'Tạm ứng',          path: '/accountant/advances',     icon: FileText },
-          { label: 'Cấu hình thuế',    path: '/accountant/tax-config',   icon: Settings },
         ],
       },
       {
@@ -199,18 +205,22 @@ export default function Sidebar() {
 
   return (
     <aside className="w-[220px] shrink-0 h-screen bg-navy-950 flex flex-col overflow-hidden">
-      {/* Logo block */}
-      <div className="h-16 flex items-center gap-2.5 px-5 border-b border-white/[.06] shrink-0">
+      {/* Logo block — click to go to public homepage */}
+      <button
+        onClick={() => navigate('/')}
+        className="h-16 flex items-center gap-2.5 px-5 border-b border-white/[.06] shrink-0 w-full hover:bg-white/[.04] transition-colors"
+        title="Về trang chủ công ty"
+      >
         <div className="w-7 h-7 bg-navy-700 rounded-md flex items-center justify-center text-[13px] font-bold text-white shrink-0">
           A
         </div>
-        <div>
+        <div className="text-left">
           <div className="text-sm font-bold text-white leading-none">ATRIA</div>
           <div className="text-[9px] font-semibold text-accent-500 uppercase tracking-[.06em] mt-[3px]">
             {config.roleLabel}
           </div>
         </div>
-      </div>
+      </button>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2">

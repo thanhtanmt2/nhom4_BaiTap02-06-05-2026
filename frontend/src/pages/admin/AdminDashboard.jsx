@@ -71,16 +71,8 @@ const AdminDashboard = () => {
     }
   }, [stats]);
 
-  const handleApprove = async (id) => {
-    try {
-      const res = await axiosClient.post(`/admin/account-requests/${id}/approve`);
-      if (res.data.success) {
-        alert(`${res.data.message}\nMật khẩu tạm: ${res.data.data.tempPassword}`);
-        fetchData();
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Có lỗi xảy ra');
-    }
+  const handleApprove = (req) => {
+    navigate('/admin/users', { state: { prefillRequest: req } });
   };
 
   const handleReject = async (id) => {
@@ -330,7 +322,7 @@ const AdminDashboard = () => {
                   </div>
                   <div className="flex gap-2 shrink-0">
                     <button
-                      onClick={() => handleApprove(req.id)}
+                      onClick={() => handleApprove(req)}
                       className="flex items-center gap-1 h-8 px-3 text-[12px] font-medium bg-success-600 hover:bg-success-700 text-white rounded-md transition-colors"
                     >
                       <CheckCircle size={13} strokeWidth={2} />

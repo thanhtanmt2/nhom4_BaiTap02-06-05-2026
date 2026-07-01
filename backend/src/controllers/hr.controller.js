@@ -442,6 +442,53 @@ exports.getDashboardData = async (req, res) => {
     // sort events by daysLeft
     events.sort((a, b) => a.daysLeft - b.daysLeft);
 
+    // 3. Stats
+    const totalEmployees = await User.count({ where: { status: 'active', role: { [Op.ne]: 'admin' } } });
+    
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const newEmployeesThisMonth = await User.count({ 
+      where: { 
+        status: 'active', 
+        role: { [Op.ne]: 'admin' },
+        created_at: { [Op.gte]: startOfMonth } 
+      } 
+    });
+
+    const sixtyDaysLater = new Date(today);
+    sixtyDaysLater.setDate(sixtyDaysLater.getDate() + 60);
+    const expiringContracts = await Contract.count({
+      where: {
+        end_date: { [Op.gte]: today, [Op.lte]: sixtyDaysLater },
+        status: 'active'
+      }
+    });
+
+    // 4. Pipeline Data
+    const pipelineStages = ['new', 'screening', 'iv1', 'iv2', 'offer'];
+    const allCandidates = await Candidate.findAll({
+      attributes: ['stage'],
+      where: {
+        stage: { [Op.in]: pipelineStages }
+      }
+    });
+
+    const pipelineCounts = { new: 0, screening: 0, iv1: 0, iv2: 0, offer: 0 };
+    let totalPipeline = 0;
+    allCandidates.forEach(c => {
+      if (pipelineCounts[c.stage] !== undefined) {
+        pipelineCounts[c.stage]++;
+        totalPipeline++;
+      }
+    });
+
+    const pipelineData = [
+      pipelineCounts.new,
+      pipelineCounts.screening,
+      pipelineCounts.iv1,
+      pipelineCounts.iv2,
+      pipelineCounts.offer
+    ];
+
     res.status(200).json({
       success: true,
       data: {
@@ -452,7 +499,14 @@ exports.getDashboardData = async (req, res) => {
           interviewer: i.interviewer || 'N/A',
           mode: (i.interview_link && i.interview_link.startsWith('http')) ? 'Online' : 'Trực tiếp'
         })),
-        events
+        events,
+        stats: {
+          totalEmployees,
+          newEmployeesThisMonth,
+          expiringContracts,
+          totalPipeline
+        },
+        pipelineData
       }
     });
 

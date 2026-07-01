@@ -437,9 +437,6 @@ export default function AdjustmentsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <button className="h-9 px-3 flex items-center gap-1.5 text-[13px] font-medium border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-            <Download size={14} strokeWidth={1.75} /> Xuất Excel
-          </button>
           <button
             onClick={() => setShowModal(true)}
             className="h-9 px-4 flex items-center gap-1.5 text-[13px] font-semibold bg-amber-600 hover:bg-amber-700 text-white rounded-md transition-colors"
