@@ -5,3 +5,5 @@
 [08:36:13 1/7/2026] UserID: 1 - Câu hỏi: Nhu cầu tuyển dụng của công ty hiện tại là gì?
 [08:37:05 1/7/2026] UserID: 1 - Câu hỏi: Yêu cầu nghiệp vụ của công ty là gì?
 [08:38:02 1/7/2026] UserID: 1 - Câu hỏi: có bao nhiêu tài khoản hệ thống
+[07:44:05 2/7/2026] UserID: Guest - Câu hỏi: làm s để tạo ra nhìu st jod vn
+[07:44:27 2/7/2026] UserID: Guest - Câu hỏi: Bạn biết steve job không
